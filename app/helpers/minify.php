@@ -15,7 +15,7 @@ class Minify extends PhpClosure {
 
 		$cache_file = $this->_getCacheFileName();
 
-		$cache_mtime = ( is_file($cache_file) ) ? filemtime($cache_file) : false;
+		$cache_mtime = ( is_file($cache_file) ) ? @filemtime($cache_file) : false;
 		$etag = ( is_file($cache_file) ) ? md5_file($cache_file) : false;
 
 		// flags
@@ -62,16 +62,23 @@ class Minify extends PhpClosure {
 			// register types
 			$data['minify'] = strpos($type, "minify") > -1 || !empty($data['encode']);
 			$data['require'] = strpos($type, "require") > -1 || !empty($data['path']);
+			$data['client'] = strpos($type, "client") > -1;
 
 			// leave standard types alone
-			if( !$data['minify'] && !$data['require']) continue;
+			if( !$data['minify'] && !$data['require'] && !$data['client']) continue;
 
 			// remove if not the intended container
 			if( !$data['group'] || $id != $data['group'] ."-min") $remove[] = $script;
 
 			// if no src add to the config file
-			if( empty($src) && $data['require'] ) {
-				$client .= $script->textContent;
+			if( empty($src) && ( (!DEBUG && $data['require']) || $data['client']) ) {
+				// #94 check dependencies
+				if( !empty( $data['deps'] ) ){
+					$deps = explode(",", $data['deps']);
+					$client .= "require(". json_encode( $deps ) .", function(){ ". $script->textContent ." });";
+				} else {
+					$client .= $script->textContent;
+				}
 				// no further processing required
 				continue;
 			}
@@ -353,6 +360,8 @@ class Minify extends PhpClosure {
 	function closureJS( $scripts ){
 		// make this a config option?
 		$baseUrl =  "assets/js/";
+		$http = new Http();
+		$http->setMethod('GET');
 		// sort results
 		//ksort_recursive( $minify );
 		// record signature
@@ -361,33 +370,40 @@ class Minify extends PhpClosure {
 		// FIX: create the dir if not available
 		if( !is_dir( $cache_path ) ) mkdir($cache_path, 0775, true);
 
-		// call google-closure
+		// process each group
 		foreach( $scripts as $name=>$group ){
 			$first = current($group);
+			$result = "";
 			// go to next group if minify flag is not true
 			if( !$first["data"]['minify'] ) continue;
 			$min = new Minify();
+			$min->cacheDir( $cache_path );
 			// get the encoding from the first member of the group
 			$encode = $first["data"]["encode"];
 			// loop through the group and add the files
 			foreach( $group as $script ){
 				// the move the domain from the script (if available)
-				$src = str_replace( array(url(), cdn() ),"", $script["src"] );
+				// check if it's a local url
+				$href = $script["src"];
+				$local = (substr($href, 0, 4) !== "http" || substr($href, 0, 2) !== "//" );
+				if( $local ) $href = url( $href );
+				$result .= $http->execute( $href );
+				//$src = str_replace( array(url(), cdn() ),"", $script["src"] );
 				// remove leading slash
-				$src = ltrim($src,'/');
-				$file = $_SERVER['DOCUMENT_ROOT'] . WEB_FOLDER . $src;
-				$md5 .= md5_file($file);
-				$min->add( $file );
+				//$src = ltrim($src,'/');
+				//$md5 .= md5_file($file);
 			}
 			// compress signatures of all files
-			$md5 = md5( $md5 );
-
-			//$min		->cacheDir( APP. "public/". $baseUrl )
-			$min		->cacheDir( $cache_path )
-						->setFile( "$name.$md5.min" );
+			$md5 = md5( $result );
+			//contents of each group are saved in a tmp file
+			$tmp_file = $cache_path . "tmp.$md5.js";
+			file_put_contents($tmp_file, $result);
+			// add tmp file
+			$min->add( $tmp_file );
+			$min->setFile( "$name.$md5.min" );
 			if( !DEBUG){
-			$min		->quiet()
-						->hideDebugInfo();
+				$min->quiet()
+					->hideDebugInfo();
 			}
 			// condition the method of minification here...
 			switch( $encode ){
@@ -406,6 +422,7 @@ class Minify extends PhpClosure {
 
 			}
 
+			// call google-closure
 			//->useClosureLibrary()
 			$min->create();
 

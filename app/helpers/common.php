@@ -6,7 +6,7 @@
 
 
 // Custom parser for KISSCMS
-// the "main" controller is used for all URLs except the once's that match existing controllers
+// checking for a controller that matches the first path - the "main" controller is used as a fallback
 function findController($url) {
 	// first remove the website path from the URL
 	$requri=preg_replace('#^'.addslashes(WEB_FOLDER).'#', '', $url);
@@ -14,8 +14,9 @@ function findController($url) {
 	preg_match('#^([^/]+)/?(.*)$#', $requri, $matches);
 	// fix - remove last match if empty
 	if(isset($matches[count($matches)-1]) && $matches[count($matches)-1]==''){ array_pop( $matches ); }
+	//
 	// first match is always the contoller - add it if it exists, is made out of alphanumeric chars and is not empty...
-	$controller = (isset($matches[1]) && preg_match('#^[A-Za-z0-9_-]+$#', $matches[1]) && !empty($matches[1])) ? $matches[1]: false;
+	$controller = (isset($matches[1]) && preg_match('#^[A-Za-z0-9_\-\.]+$#', $matches[1]) && !empty($matches[1])) ? $matches[1]: false;
 	// check if the controller exists
 	$controllerfile = getPath('controllers/'.$controller.'.php');
 	// check if what we found is sane
@@ -122,7 +123,7 @@ function getFile($filename) {
 		case "jpeg":
 		case "jpg": $ctype="image/jpg"; break;
 		default: $ctype="text/html";
-    }
+	}
 
 	// FIX: exit if this is a directory
 	if( is_dir($filename) ) return false;
@@ -133,7 +134,7 @@ function getFile($filename) {
 	$etag = md5_file($filename);
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $mtime)." GMT");
 	header("Etag: $etag");
-    return $output;
+	return $output;
 }
 
 function getPath( $file ) {
@@ -167,12 +168,11 @@ function getPath( $file ) {
 	return false;
 }
 
-
-function url($file=''){
+function url($file='', $cdn=false){
 	// get the full uri for the file
 	$uri = uri($file);
 	// check if it is a static
-	if( isStatic( $uri ) && defined("CDN")){
+	if( $cdn && defined("CDN") && isStatic( $uri )){
 		// load the cdn address instead
 		// remove trailing slash, if any
 		$domain = ( substr(CDN, -1) == "/" ) ? substr(CDN, 0, -1) : CDN;
@@ -191,7 +191,7 @@ function url($file=''){
 	// add the uri
 	$url = $domain . $uri;
 
-  	return $url;
+	return $url;
 }
 
 function uri($file=''){
@@ -220,6 +220,11 @@ function cdn($file=''){
 	}
 }
 
+// return an html attribute for a value
+function attr($name=false, $value=false){
+	if(!$name || !$value || empty($value)) return;
+	return $name .'="'. $value .'"';
+}
 
 // find all files with a certain name
 function findFiles($filename) {
@@ -305,9 +310,9 @@ function truncate($string, $limit, $break=".", $pad="...")
 
   // is $break present between $limit and the end of the string?
   if(false !== ($breakpoint = strpos($string, $break, $limit))) {
-    if($breakpoint < strlen($string) - 1) {
-      $string = substr($string, 0, $breakpoint) . $pad;
-    }
+	if($breakpoint < strlen($string) - 1) {
+	  $string = substr($string, 0, $breakpoint) . $pad;
+	}
   }
 
   return $string;
@@ -319,7 +324,7 @@ function beautify($string, $block='.', $ucwords=true)
 
   // stop in the occurance of the designated character
   if( $block ){
-  	$string = substr( $string, 0 , strpos($string, $block) );
+	$string = substr( $string, 0 , strpos($string, $block) );
   }
   // replace all underscores with spaces
   $string = str_replace( "_", " ", $string );
@@ -388,7 +393,7 @@ function check_dir( $file=false, $create=false, $chmod=0755 ){
 		foreach( $dirs as $folder){
 			$path .= array_shift($dirs) ."/";
 			// create each dir (if not available)
-			if( !is_dir( $path ) ) mkdir($path, $chmod, true);
+			if( !is_dir( $path ) ) @mkdir($path, $chmod, true);
 		}
 
 	}
@@ -411,32 +416,32 @@ function check_dir( $file=false, $create=false, $chmod=0755 ){
  */
 function get_time_difference( $start, $end )
 {
-    $uts['start']      =    strtotime( $start );
-    $uts['end']        =    strtotime( $end );
-    if( $uts['start']!==-1 && $uts['end']!==-1 )
-    {
-        if( $uts['end'] >= $uts['start'] )
-        {
-            $diff    =    $uts['end'] - $uts['start'];
-            if( $days=intval((floor($diff/86400))) )
-                $diff = $diff % 86400;
-            if( $hours=intval((floor($diff/3600))) )
-                $diff = $diff % 3600;
-            if( $minutes=intval((floor($diff/60))) )
-                $diff = $diff % 60;
-            $diff    =    intval( $diff );
-            return( array('days'=>$days, 'hours'=>$hours, 'minutes'=>$minutes, 'seconds'=>$diff) );
-        }
-        else
-        {
-            trigger_error( "Ending date/time is earlier than the start date/time", E_USER_WARNING );
-        }
-    }
-    else
-    {
-        trigger_error( "Invalid date/time data detected", E_USER_WARNING );
-    }
-    return( false );
+	$uts['start']      =    strtotime( $start );
+	$uts['end']        =    strtotime( $end );
+	if( $uts['start']!==-1 && $uts['end']!==-1 )
+	{
+		if( $uts['end'] >= $uts['start'] )
+		{
+			$diff    =    $uts['end'] - $uts['start'];
+			if( $days=intval((floor($diff/86400))) )
+				$diff = $diff % 86400;
+			if( $hours=intval((floor($diff/3600))) )
+				$diff = $diff % 3600;
+			if( $minutes=intval((floor($diff/60))) )
+				$diff = $diff % 60;
+			$diff    =    intval( $diff );
+			return( array('days'=>$days, 'hours'=>$hours, 'minutes'=>$minutes, 'seconds'=>$diff) );
+		}
+		else
+		{
+			trigger_error( "Ending date/time is earlier than the start date/time", E_USER_WARNING );
+		}
+	}
+	else
+	{
+		trigger_error( "Invalid date/time data detected", E_USER_WARNING );
+	}
+	return( false );
 }
 
 
@@ -447,45 +452,45 @@ function get_time_difference( $start, $end )
  ********************************/
 if(!function_exists('get_called_class')) {
 function get_called_class($bt = false,$l = 1) {
-    if (!$bt) $bt = debug_backtrace();
-    if (!isset($bt[$l])) throw new Exception("Cannot find called class -> stack level too deep.");
-    if (!isset($bt[$l]['type'])) {
-        throw new Exception ('type not set');
-    }
-    else switch ($bt[$l]['type']) {
-        case '::':
-            $lines = file($bt[$l]['file']);
-            $i = 0;
-            $callerLine = '';
-            do {
-                $i++;
-                $callerLine = $lines[$bt[$l]['line']-$i] . $callerLine;
-            } while (stripos($callerLine,$bt[$l]['function']) === false);
-            preg_match('/([a-zA-Z0-9\_]+)::'.$bt[$l]['function'].'/',
-                        $callerLine,
-                        $matches);
-            if (!isset($matches[1])) {
-                // must be an edge case.
-                throw new Exception ("Could not find caller class: originating method call is obscured.");
-            }
-            switch ($matches[1]) {
-                case 'self':
-                case 'parent':
-                    return get_called_class($bt,$l+1);
-                default:
-                    return $matches[1];
-            }
-            // won't get here.
-        case '->': switch ($bt[$l]['function']) {
-                case '__get':
-                    // edge case -> get class of calling object
-                    if (!is_object($bt[$l]['object'])) throw new Exception ("Edge case fail. __get called on non object.");
-                    return get_class($bt[$l]['object']);
-                default: return $bt[$l]['class'];
-            }
+	if (!$bt) $bt = debug_backtrace();
+	if (!isset($bt[$l])) throw new Exception("Cannot find called class -> stack level too deep.");
+	if (!isset($bt[$l]['type'])) {
+		throw new Exception ('type not set');
+	}
+	else switch ($bt[$l]['type']) {
+		case '::':
+			$lines = file($bt[$l]['file']);
+			$i = 0;
+			$callerLine = '';
+			do {
+				$i++;
+				$callerLine = $lines[$bt[$l]['line']-$i] . $callerLine;
+			} while (stripos($callerLine,$bt[$l]['function']) === false);
+			preg_match('/([a-zA-Z0-9\_]+)::'.$bt[$l]['function'].'/',
+						$callerLine,
+						$matches);
+			if (!isset($matches[1])) {
+				// must be an edge case.
+				throw new Exception ("Could not find caller class: originating method call is obscured.");
+			}
+			switch ($matches[1]) {
+				case 'self':
+				case 'parent':
+					return get_called_class($bt,$l+1);
+				default:
+					return $matches[1];
+			}
+			// won't get here.
+		case '->': switch ($bt[$l]['function']) {
+				case '__get':
+					// edge case -> get class of calling object
+					if (!is_object($bt[$l]['object'])) throw new Exception ("Edge case fail. __get called on non object.");
+					return get_class($bt[$l]['object']);
+				default: return $bt[$l]['class'];
+			}
 
-        default: throw new Exception ("Unknown backtrace method type");
-    }
+		default: throw new Exception ("Unknown backtrace method type");
+	}
 }
 }
 
@@ -530,7 +535,7 @@ function myUrl($path='',$fullurl=true){
 	// FIX: Remove the ending slash
 	$url = ( substr($url, -1) == "/" ) ? substr($url, 0, -1) : $url;
 
-  	return $url;
+	return $url;
 }
 
 
@@ -563,52 +568,52 @@ function query_to_array( $string, $flat=false ){
 }
 
 function ksort_recursive(&$array, $sort_flags = SORT_REGULAR) {
-    if (!is_array($array)) return false;
-    ksort($array, $sort_flags);
-    foreach ($array as &$arr) {
-        ksort_recursive($arr, $sort_flags);
-    }
-    return true;
+	if (!is_array($array)) return false;
+	ksort($array, $sort_flags);
+	foreach ($array as &$arr) {
+		ksort_recursive($arr, $sort_flags);
+	}
+	return true;
 }
 
 function encode($string="",$base=36,$key="KISSCMS") {
 	// variables
 	$j=0;
 	$hash="";
-    $key = sha1($key);
-    $strLen = strlen($string);
-    $keyLen = strlen($key);
-    for ($i = 0; $i < $strLen; $i++) {
-        $ordStr = ord(substr($string,$i,1));
-        if ($j == $keyLen) { $j = 0; }
-        $ordKey = ord(substr($key,$j,1));
-        $j++;
-        $hash .= strrev(base_convert(dechex($ordStr + $ordKey),16,$base));
-    }
-    return $hash;
+	$key = sha1($key);
+	$strLen = strlen($string);
+	$keyLen = strlen($key);
+	for ($i = 0; $i < $strLen; $i++) {
+		$ordStr = ord(substr($string,$i,1));
+		if ($j == $keyLen) { $j = 0; }
+		$ordKey = ord(substr($key,$j,1));
+		$j++;
+		$hash .= strrev(base_convert(dechex($ordStr + $ordKey),16,$base));
+	}
+	return $hash;
 }
 
 function decode($string="",$base=36,$key="KISSCMS") {
-    // variables
+	// variables
 	$j=0;
 	$hash="";
-    $key = sha1($key);
-    $strLen = strlen($string);
-    $keyLen = strlen($key);
-    for ($i = 0; $i < $strLen; $i+=2) {
-        $ordStr = hexdec(base_convert(strrev(substr($string,$i,2)),$base,16));
-        if ($j == $keyLen) { $j = 0; }
-        $ordKey = ord(substr($key,$j,1));
-        $j++;
-        $hash .= chr($ordStr - $ordKey);
-    }
-    return $hash;
+	$key = sha1($key);
+	$strLen = strlen($string);
+	$keyLen = strlen($key);
+	for ($i = 0; $i < $strLen; $i+=2) {
+		$ordStr = hexdec(base_convert(strrev(substr($string,$i,2)),$base,16));
+		if ($j == $keyLen) { $j = 0; }
+		$ordKey = ord(substr($key,$j,1));
+		$j++;
+		$hash .= chr($ordStr - $ordKey);
+	}
+	return $hash;
 }
 
 /*
 function redirect($url,$alertmsg='') {
   if ($alertmsg)
-    addjAlert($alertmsg,$url);
+	addjAlert($alertmsg,$url);
   header('Location: '.myUrl($url));
   exit;
 }
@@ -619,30 +624,30 @@ function redirect($url,$alertmsg='') {
 /*
 function addjAlert($msg,$uri='') {
   if ($msg) {
-    $s="alert(\"$msg\");";
-    $_SESSION['jAlert'][]=array($uri,$s);
+	$s="alert(\"$msg\");";
+	$_SESSION['jAlert'][]=array($uri,$s);
   }
 }
 
 function getjAlert() {
   if (!isset($_SESSION['jAlert']) || !$_SESSION['jAlert'])
-    return '';
+	return '';
   $pageuri=$_SERVER['REQUEST_URI'];
   $current=null;
   $remainder=null;
   foreach ($_SESSION['jAlert'] as $x) {
-    $uri=$x[0];
-    if (!$uri || strpos($pageuri,$uri)!==false)
-      $current[]=$x[1];
-    else
-      $remainder[]=$x;
+	$uri=$x[0];
+	if (!$uri || strpos($pageuri,$uri)!==false)
+	  $current[]=$x[1];
+	else
+	  $remainder[]=$x;
   }
   if ($current) {
-    if ($remainder)
-      $_SESSION['jAlert']=$remainder;
-    else
-      unset($_SESSION['jAlert']);
-    return '<script type="text/javascript">'."\n".implode("\n",$current)."\n</script>\n";
+	if ($remainder)
+	  $_SESSION['jAlert']=$remainder;
+	else
+	  unset($_SESSION['jAlert']);
+	return '<script type="text/javascript">'."\n".implode("\n",$current)."\n</script>\n";
   }
   return '';
 }
