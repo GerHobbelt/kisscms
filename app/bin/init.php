@@ -294,14 +294,14 @@ function requireOnly($folder='', $only=array() ){
 set_exception_handler('uncaught_exception_handler');
 
 function uncaught_exception_handler($e) {
-  ob_end_clean(); //dump out remaining buffered text
+  if( ob_get_length() ) ob_end_clean(); //dump out remaining buffered text
   $vars['message']=$e;
-  die(View::do_fetch( getPath('views/errors/exception_uncaught.php'),$vars));
+  die(View::do_fetch( getPath('views/errors/500.php'),$vars));
 }
 
 function custom_error($msg='') {
   $vars['msg']=$msg;
-  die(View::do_fetch( getPath('views/errors/custom_error.php'),$vars));
+  die(View::do_fetch( getPath('views/errors/400.php'),$vars));
 }
 
 
