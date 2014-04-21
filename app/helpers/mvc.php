@@ -30,7 +30,9 @@ class Model extends KISS_Model  {
 				// Continue logic on a specific error code (14: unable to open database file)
 				$error = (string)$e->getCode();
 				if( $error == "14" ){ 
-					// see if there is a data directory
+                                  // #79 report last error on SQLite fail
+                                  print_r(error_get_last());
+                                  // see if there is a data directory
 					if( !is_dir( DATA ) ){ 
 						// create the directory with write access
 						mkdir( DATA, 0775);
@@ -358,7 +360,7 @@ class Controller extends KISS_Controller {
 		} else {
 			header("Access-Control-Allow-Origin: *");
 		}
-			header("Access-Control-Allow-Headers: Content-Type, X-Requested-With, X-PINGOTHER");
+			header("Access-Control-Allow-Headers: X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-PINGOTHER");
 			header("Access-Control-Max-Age: 86400");    // cache for 1 day
 			header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); 
 		
