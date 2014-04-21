@@ -50,11 +50,32 @@ class Model extends KISS_Model  {
 		//return call_user_func($this->dbhfnname, $this->db);
 	}
 
-	//Example of adding your own method to the core class
-	function gethtmlsafe($key) {
-		return htmlspecialchars($this->get($key));
+
+//===============================================
+// CRUD methods
+//===============================================
+
+
+//===============================================
+// Query methods
+//===============================================
+
+	// run a lookup query based on a field
+	function find($key= false, $value=false){
+		// TBA
+		die("find - Not implemented yet.");
 	}
 
+	// run a lookup query based on a field, returns first item
+	function findOne($key= false, $value=false){
+		// TBA
+		die("findOne - Not implemented yet.");
+	}
+
+
+//===============================================
+// Tadle methods
+//===============================================
 
 	function create_table($name, $fields, $db=false){
 		$dbh = $this->getdbh();
@@ -96,6 +117,25 @@ class Model extends KISS_Model  {
 		return $this;
 	}
 
+	// merge the existing data of a key
+	function extend($key=false, $data=array()){
+		// prerequisite
+		if(!$key) return false;
+		// first get existing data
+		$value = $this->get( $key );
+		// get returns false only when it doesn't find a value?
+		//if( $value === false ) return;
+		// different condition for scalar?
+		if( is_null($value) || is_scalar($value) ) {
+			$value = $data;
+		} else {
+			// array?
+			$value = array_merge( (array)$value, (array)$data );
+		}
+		// either way save back...
+		$this->set( $key, $value);
+	}
+
 	function retrieve_many($wherewhat='',$bindings='') {
 		$dbh=$this->getdbh();
 		if (is_scalar($bindings))
@@ -121,7 +161,7 @@ class Model extends KISS_Model  {
 		if (isset($this->rs[$key]))
 			return $this->rs[$key];
 		else
-			return false;
+			return null;
 	}
 
 	function getAll(){
@@ -130,7 +170,7 @@ class Model extends KISS_Model  {
 		foreach($this->rs as $k=>$v){
 			$result = $this->get($k);
 			// don't add data that 's returned as 'false'
-			if( $result ) $array[$k] = ( is_string($result) ) ? stripslashes( $result ) : $result;
+			if( !is_null($result) ) $array[$k] = ( is_string($result) ) ? stripslashes( $result ) : $result;
 		}
 		return $array;
 	}
@@ -145,6 +185,15 @@ class Model extends KISS_Model  {
 		} else {
 			return false;
 		}
+	}
+
+//===============================================
+// Helper methods
+//===============================================
+
+	//Example of adding your own method to the core class
+	function gethtmlsafe($key) {
+		return htmlspecialchars($this->get($key));
 	}
 
 	// #115 generate a random UUID v4
@@ -180,7 +229,7 @@ class Controller extends KISS_Controller {
 
 	function __construct($controller_path,$web_folder,$default_controller,$default_function)  {
 		// generic redirection for secure connections (assuming that ssl is on port 443)
-		if( defined('SSL') && SSL && $_SERVER['SERVER_PORT'] != "443" ) header('Location: '.url( request_uri() ) );
+		if( defined('SSL') && SSL && $_SERVER['SERVER_PORT'] != "443" ) header('Location: '. url( request_uri() ) );
 
 		// add the config in the data object
 		$this->data['config'] = $GLOBALS['config'];
@@ -193,7 +242,9 @@ class Controller extends KISS_Controller {
 
 		// #116 add site info in the client object
 		$GLOBALS['client']['site']['name'] = $GLOBALS['config']['main']['site_name'];
-		$GLOBALS['client']['site']['url'] = url();
+		$url = url();
+		// FIX: removing ending slash
+		$GLOBALS['client']['site']['url'] = ( substr( $url, -1) == "/" ) ? substr( $url, 0, -1) : $url;
 
 		parent::__construct($controller_path,$web_folder,$default_controller,$default_function);
 	}
