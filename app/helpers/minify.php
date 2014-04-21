@@ -1,6 +1,6 @@
 <?php
 
-class Minify extends PhpClosure {
+class Minify extends UglifyJS {
 
 	protected $_content = array();
 	protected $_dom;
@@ -104,7 +104,7 @@ class Minify extends PhpClosure {
 
 
 		// process minification
-		$group = $this->closureJS( $group );
+		$group = $this->uglifyJS( $group );
 		// process requireJS
 		$dom = $this->requireJS( $group, $dom );
 
@@ -357,7 +357,7 @@ class Minify extends PhpClosure {
 
 	}
 
-	function closureJS( $scripts ){
+	function uglifyJS( $scripts ){
 		// make this a config option?
 		$baseUrl =  "assets/js/";
 		$http = new Http();
@@ -376,8 +376,9 @@ class Minify extends PhpClosure {
 			$result = "";
 			// go to next group if minify flag is not true
 			if( !$first["data"]['minify'] ) continue;
-			$min = new Minify();
+			$min = new UglifyJS();
 			$min->cacheDir( $cache_path );
+			$min->compiler( $GLOBALS['config']['compress']['uglify_service'] );
 			// get the encoding from the first member of the group
 			$encode = $first["data"]["encode"];
 			// loop through the group and add the files
@@ -422,9 +423,7 @@ class Minify extends PhpClosure {
 
 			}
 
-			// call google-closure
-			//->useClosureLibrary()
-			$min->create();
+			$min->write();
 
 			// add the signature in the group
 			$scripts[$name][]["data"]["md5"] = $md5;
@@ -529,7 +528,7 @@ class Minify extends PhpClosure {
 		return $attr;
 	}
 
-
+/*
 	function setFile( $name=false ) {
 		if($name) $this->_file = $name;
 		return $this;
@@ -538,7 +537,7 @@ class Minify extends PhpClosure {
 	function _getCacheFileName() {
 		return ( empty($this->_file) ) ? $this->_cache_dir . $this->_getHash() . ".js" : $this->_cache_dir . $this->_file. ".js";
 	}
-
+*/
 	function trimWhitespace( $string, $replace=" " ){
 		// replace multiple spaces with one
 		return preg_replace( '/\s+/', $replace, $string );
