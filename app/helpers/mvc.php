@@ -146,6 +146,28 @@ class Model extends KISS_Model  {
 		}
 	}
 
+	// #115 generate a random UUID v4
+	function uuid() {
+		return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+			// 32 bits for "time_low"
+			mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
+
+			// 16 bits for "time_mid"
+			mt_rand( 0, 0xffff ),
+
+			// 16 bits for "time_hi_and_version",
+			// four most significant bits holds version number 4
+			mt_rand( 0, 0x0fff ) | 0x4000,
+
+			// 16 bits, 8 bits for "clk_seq_hi_res",
+			// 8 bits for "clk_seq_low",
+			// two most significant bits holds zero and one for variant DCE1.1
+			mt_rand( 0, 0x3fff ) | 0x8000,
+
+			// 48 bits for "node"
+			mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
+		);
+	}
 }
 
 //===============================================================
@@ -161,19 +183,34 @@ class Controller extends KISS_Controller {
 
 		// add the config in the data object
 		$this->data['config'] = $GLOBALS['config'];
+		// add admin flag
+		if( array_key_exists('admin', $_SESSION) ) $this->data['admin'] = $_SESSION['admin'];
 
 		// set the template the controller is using
 		$template = strtolower( get_class($this) ) .".php";
 		$this->data['template']= ( is_file( TEMPLATES.$template ) ) ? $template : false;
 
+		// #116 add site info in the client object
+		$GLOBALS['client']['site']['name'] = $GLOBALS['config']['main']['site_name'];
+		$GLOBALS['client']['site']['url'] = url();
+
 		parent::__construct($controller_path,$web_folder,$default_controller,$default_function);
 	}
 
+	// display the client vars
 	function client_js() {
+		// container
+		if( !array_key_exists("_client", $_SESSION) || !is_array($_SESSION["_client"]) )
+				$_SESSION["_client"] = array();
+		//
+		$path = null;
+		if( !empty( $_SERVER["HTTP_REFERER"] ) ){
+			$url = parse_url ( $_SERVER["HTTP_REFERER"] );
+			$path = ( array_key_exists('path', $url) ) ? $url['path'] : "/";
+		}
 		// set the right header
 		header('Content-Type: application/javascript');
-		// display the client vars
-		echo ( !empty( $_SESSION["_client"] ) ) ? $_SESSION["_client"] : "";
+		echo ( !empty( $_SESSION["_client"][$path] ) ) ? $_SESSION["_client"][$path] : "";
 	}
 
 	//This function parses the HTTP request to set the controller name, function name and parameter parts.
@@ -294,7 +331,23 @@ class Controller extends KISS_Controller {
 		exit;
 	}
 
-	function render() {
+	function render( $view=false) {
+		// include a default view for body sections
+		$class = strtolower( get_class($this) );
+		//$this->data["body"][$class]["view"] = ($view) ? getPath('views/'.$class.'/'. $view .'.php') : getPath('views/'.$class.'/body.php');
+		// get the actual path of the view
+		$view = getPath('views/'.$class.'/'. $view .'.php');
+		if( array_key_exists("body" , $this->data ) ){
+			foreach( $this->data["body"] as $k => $v ){
+				if( !array_key_exists("view", $v) ){
+					$this->data["body"][$k]["view"] = ($view) ? $view : getPath('views/'.$class.'/body.php');
+				}
+			}
+		} else {
+			// there are no body data - may still be a "static" view
+			$this->data["body"] = array();
+			$this->data["body"][$class]["view"] = ($view) ? $view : getPath('views/'.$class.'/body.php');
+		}
 		// display the page
 		Template::output($this->data);
 	}

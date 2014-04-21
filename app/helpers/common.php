@@ -95,6 +95,15 @@ function isStatic( $file ) {
 			return $target;
 		}
 	}
+	# 110 looking into web root for plugins
+	if( is_dir( SITE_ROOT . "/plugins" ) ){
+		$files = glob(SITE_ROOT . "/plugins/*/public/$file");
+		if( $files && count($files) > 0 ) {
+			// arbitrary pick the first file - should have a comparison mechanism in place
+			$target = $files[0];
+			return $target;
+		}
+	}
 	//lastly check the cache (less than an hour old)
 	$cache = new Minify_Cache_File();
 	//if( $cache->isValid($file, time("now")-3600) ) return $cache->tmp() ."/". $file;
@@ -157,13 +166,20 @@ function getPath( $file ) {
 	}
 	// check the plugins folder if we still haven't found anything
 	if( defined("PLUGINS") ){
-		// find the core file second
+		// find the plugins file
 		if (file_exists(PLUGINS.$file)) return PLUGINS.$file;
 		// check the plugins folder
 		$search = glob(PLUGINS."*/$file", GLOB_BRACE);
 		if($search) return array_pop($search);
 	}
-
+	# 110 looking into web root for plugins
+	if( is_dir( SITE_ROOT . "/plugins" ) ){
+		// find the plugins file
+		if (file_exists(SITE_ROOT ."/plugins/". $file)) return SITE_ROOT ."/plugins/". $file;
+		// check the plugins folder
+		$search = glob(SITE_ROOT ."/plugins/*/$file", GLOB_BRACE);
+		if($search) return array_pop($search);
+	}
 	// nothing checks out...
 	return false;
 }
@@ -213,6 +229,8 @@ function cdn($file=''){
 	if (defined("CDN")){
 		// remove trailing slash, if any
 		$url = ( substr(CDN, -1) == "/" ) ? substr(CDN, 0, -1) : CDN;
+		// #108 remove www from cdn address (if set by SERVER_NAME)
+		$url = str_replace("www.",'',$url);
 		return $url . $uri;
 	} else {
 		// fallback to the domain name
@@ -251,6 +269,14 @@ function findFiles($filename) {
 		if( is_array( $files) ){
 			$return = array_merge($return, $files);
 		}
+	}
+	# 110 looking into web root for plugins
+	if( is_dir( SITE_ROOT . "/plugins" ) ){
+		$files = glob(SITE_ROOT . "/plugins/*/views/$filename");
+		if( is_array( $files) ){
+			$return = array_merge($return, $files);
+		}
+
 	}
 	return $return;
 }
@@ -391,7 +417,9 @@ function check_dir( $file=false, $create=false, $chmod=0755 ){
 		$dirs = explode("/", $info['dirname']);
 		$path = "/";
 		foreach( $dirs as $folder){
-			$path .= array_shift($dirs) ."/";
+			//$path .= array_shift($dirs) ."/";
+			if(empty($folder)) continue;
+			$path .= $folder ."/";
 			// create each dir (if not available)
 			if( !is_dir( $path ) ) @mkdir($path, $chmod, true);
 		}
@@ -399,6 +427,14 @@ function check_dir( $file=false, $create=false, $chmod=0755 ){
 	}
 	// assuming that all the folders missing are created...
 	return true;
+}
+
+// Get a normalized numeric epoch timestamp in microseconds
+function timestamp(){
+	$timestamp = (string) $_SERVER['REQUEST_TIME'];
+	// aws:#5 include microseconds when calculating REQUEST_TIME in PHP < 5.4
+	if( strlen($timestamp) == 10 ) $timestamp .= "000";
+	return $timestamp;
 }
 
 /**
@@ -443,7 +479,6 @@ function get_time_difference( $start, $end )
 	}
 	return( false );
 }
-
 
 /********************************
  * Retro-support of get_called_class()

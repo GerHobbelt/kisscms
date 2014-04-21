@@ -24,7 +24,7 @@ $templates = $_SERVER['DOCUMENT_ROOT'] . WEB_FOLDER . 'templates/';
 // lookup APP folder first
 if( !is_dir($templates) && defined("BASE") ){
 	// then look up the default template location
-	$templates = realpath(BASE . '../' ) . "/html/templates/";
+	$templates = realpath(BASE . '../' ) . "/public/templates/";
 	if( !is_dir($templates) ){
 		// lastly lookup at the root
 		$templates = realpath(BASE . '../' ) . "/templates/";
@@ -45,8 +45,9 @@ if( defined("SHARED") ) putenv('TMPDIR=' . ini_get('upload_tmp_dir'));
 // OTHER CONSTANTS
 //===============================================
 
-// find if this is running from localhost
-define("IS_LOCALHOST", (strpos($_SERVER['SERVER_NAME'], "localhost") !== false) );
+// find if this is running from localhost - $GLOBALS['SERVER_NAME'] is (originally) set in index.php
+if( !array_key_exists("SERVER_NAME", $GLOBALS) ) $GLOBALS['SERVER_NAME'] = $_SERVER['SERVER_NAME'];
+define("IS_LOCALHOST", (strpos($GLOBALS['SERVER_NAME'], "localhost") !== false) );
 // set to true to enable debug mode (where supported)
 if(!defined("DEBUG")) define('DEBUG', false);
 
@@ -158,6 +159,11 @@ function requireAll($folder='', $exclude=array(), $priority=array()){
 				if($search) $exception = array_merge( $exception, (array)$search );
 
 			}
+			# 110 looking into web root for plugins
+			if( is_dir( SITE_ROOT . "/plugins" ) ){
+				$search = glob(SITE_ROOT . "/plugins/*/$folder/$file",GLOB_BRACE);
+				if($search) $exception = array_merge( $exception, (array)$search );
+			}
 		}
 	}
 	// all the files in the priority list
@@ -167,23 +173,28 @@ function requireAll($folder='', $exclude=array(), $priority=array()){
 			if(!$priorities) $priorities = array();
 			if( defined("APP") ){
 				$search = glob(APP."$folder/$file",GLOB_BRACE);
-				if($search) $priorities =  array_merge( $priorities, (array)$search );
+				if($search) $priorities = array_merge( $priorities, (array)$search );
 				// check the plugins subfolder
 				$search = glob(APP."plugins/*/$folder/$file",GLOB_BRACE);
-				if($search) $priorities =  array_merge( $priorities, (array)$search );
+				if($search) $priorities = array_merge( $priorities, (array)$search );
 			}
 			if( defined("BASE") ){
 				$search = glob(BASE."$folder/$file",GLOB_BRACE);
 				if($search) $priorities = array_merge( $priorities, (array)$search );
 				// check the plugins subfolder
 				$search = glob(BASE."plugins/*/$folder/$file",GLOB_BRACE);
-				if($search) $priorities =  array_merge( $priorities, (array)$search );
+				if($search) $priorities = array_merge( $priorities, (array)$search );
 			}
 			// check in the plugins directory
 			if( defined("PLUGINS")){
 				$search = glob(PLUGINS."*/$folder/$file",GLOB_BRACE);
-				if($search) $priorities =  array_merge( $priorities, (array)$search );
+				if($search) $priorities = array_merge( $priorities, (array)$search );
 
+			}
+			# 110 looking into web root for plugins
+			if( is_dir( SITE_ROOT . "/plugins" ) ){
+				$search = glob(SITE_ROOT . "/plugins/*/$folder/$file",GLOB_BRACE);
+				if($search) $priorities = array_merge( $priorities, (array)$search );
 			}
 		}
 	}
@@ -218,11 +229,16 @@ function requireAll($folder='', $exclude=array(), $priority=array()){
 		}
 	}
 	// look into the plugins folder
+	$plugins = array();
 	if( defined("PLUGINS") ){
-		$plugins = glob(PLUGINS."*/$folder/*",GLOB_BRACE);
-		if(!$plugins) $plugins = array();
+		$search = glob(PLUGINS."*/$folder/*",GLOB_BRACE);
+		if($search) $plugins = array_merge( $plugins, (array)$search );
 	}
-
+	# 110 looking into web root for plugins
+	if( is_dir( SITE_ROOT . "/plugins" ) ){
+		$search = glob(SITE_ROOT . "/plugins/*/$folder/*",GLOB_BRACE);
+		if($search) $plugins = array_merge( $plugins, (array)$search );
+	}
 
 	// merge all the arrays together
 	$files = array_merge( $files, $base, $app, $plugins );
@@ -291,6 +307,10 @@ function requireOnly($folder='', $only=array() ){
 			$search = glob(PLUGINS."*/$folder/$file",GLOB_BRACE);
 			if($search) $plugins = array_merge( $plugins, (array)$search );
 		}
+		if( is_dir( SITE_ROOT . "/plugins" ) ){
+			$search = glob(SITE_ROOT . "/plugins/*/$folder/$file",GLOB_BRACE);
+			if($search) $plugins = array_merge( $plugins, (array)$search );
+		}
 		// merge all the arrays together
 		$files = array_merge( $files, $base, $app, $plugins );
 
@@ -307,19 +327,49 @@ function requireOnly($folder='', $only=array() ){
 //===============================================
 // Uncaught Exception Handling
 //===============================================s
-set_exception_handler('uncaught_exception_handler');
 
 function uncaught_exception_handler($e) {
-  if( ob_get_length() ) ob_end_clean(); //dump out remaining buffered text
-  $vars['message']=$e;
-  die(View::do_fetch( getPath('views/errors/500.php'),$vars));
+	if( ob_get_length() ) ob_end_clean(); //dump out remaining buffered text
+	$vars['message']=$e;
+	die(View::do_fetch( getPath('views/errors/500.php'),$vars));
 }
 
-function custom_error($msg='') {
-  $vars['msg']=$msg;
-  die(View::do_fetch( getPath('views/errors/400.php'),$vars));
+function custom_error($errno, $message, $file, $line){
+	if (!(error_reporting() & $errno)) {
+		// This error code is not included in error_reporting
+		return;
+	}
+
+	switch ($errno) {
+	case E_USER_ERROR:
+		$type= "ERROR";
+		break;
+	case E_USER_WARNING:
+		$type= "WARNING";
+		break;
+	case E_USER_NOTICE:
+		$type= "NOTICE";
+		break;
+	default:
+		$type= "Unknown error type";
+		break;
+	}
+
+	$vars = array(
+		'type' => $type,
+		'message' => $message,
+		'file' => $file,
+		'line' => $line
+	);
+	die(View::do_fetch( getPath('views/errors/400.php'),$vars));
+
+	/* Don't execute PHP internal error handler */
+	return true;
+
 }
 
+set_error_handler("custom_error");
+set_exception_handler("uncaught_exception_handler");
 
 //===============================================
 // Srart the controller

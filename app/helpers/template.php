@@ -27,8 +27,8 @@ class Template extends KISS_View {
 		$template = new Template($vars);
 		// first thing, check if there's a cached version of the template
 		$id = "html/". $_SERVER['HTTP_HOST'] ."_". $template->hash;
-		//$cache = self::getCache( $id );
-		$cache = false;
+		$cache = self::getCache( $id );
+		//$cache = false;
 		if($cache && !DEBUG) { echo $cache; return; }
 		// continue processing
 		$template->setupClient();
@@ -44,7 +44,7 @@ class Template extends KISS_View {
 		// output the final markup - clear whitespace (if not in debug mode)
 		echo $output;
 		// set the cache for later use
-		//self::setCache( $id, $output);
+		self::setCache( $id, $output);
 	}
 
 	public static function head( $vars=false ){
@@ -56,13 +56,15 @@ class Template extends KISS_View {
 
 	public static function body($view=false){
 		$data = $GLOBALS['body'];
+		if( empty($data) ) return;
 		foreach($data as $part){
-			if ( $view && !isset($part['status']) )
-			  View::do_dump( getPath('views/main/body-'. $view .'.php'), $part);
-			elseif ( array_key_exists('view', $part) )
-			  View::do_dump( $part['view'], $part);
-			else
-			  View::do_dump( getPath('views/main/body.php'), $part);
+			if( $view && !isset($part['status']) ){
+				View::do_dump( getPath('views/main/body-'. $view .'.php'), $part);
+			}elseif( array_key_exists('view', $part) ){
+				View::do_dump( $part['view'], $part);
+			}else{
+				View::do_dump( getPath('views/main/body.php'), $part);
+			}
 		}
 	}
 
@@ -115,7 +117,7 @@ class Template extends KISS_View {
 		// process require configuration
 		$this->createClient($dom);
 
-		$output =  $dom->saveHTML();
+		$output = $dom->saveHTML();
 
 		// output the final markup - clear whitespace
 		return  ( DEBUG ) ? $output : $this->trimWhitespace( $output );
@@ -176,7 +178,7 @@ class Template extends KISS_View {
 		if( preg_match('/[a-z0-9_.\/\\\]plugins[a-z0-9_.\/\\\]*$/i', $file, $match) ) {
 			// $match =  /plugins/{section}/views/file.php
 			$path = explode("/", $match[0]);
-			// the lovation of the section is rather hardcoded here but there must be a better way...
+			// the location of the section is rather hardcoded here but there must be a better way...
 			$section = $path[2];
 		//otherwise it is in the main BASE or APP view folder
 		} else {
@@ -286,7 +288,8 @@ class Template extends KISS_View {
 		$dom = $this->updateDom($script, $dom);
 		*/
 		// set the client as a session var
-		$_SESSION["_client"] = $client;
+		if( !array_key_exists("_client", $_SESSION) ) $_SESSION["_client"] = array();
+		$_SESSION["_client"][$_SERVER["REQUEST_URI"]] = $client;
 	}
 
 	public static function doList( $selected=null){
