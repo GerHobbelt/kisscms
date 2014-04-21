@@ -23,9 +23,10 @@ class Model extends KISS_Model  {
 		// generate the name prefix
 		$db_name = "db_" . substr( $this->db, 0, stripos($this->db, ".") );
 		if (!isset($GLOBALS[ $db_name ])) {
+
 			try {
-			  $GLOBALS[ $db_name ] = new PDO('sqlite:'. DATA . $this->db);
-			  //$GLOBALS['dbh'] = new PDO('mysql:host=localhost;dbname=dbname', 'username', 'password');
+				$GLOBALS[ $db_name ] = new PDO('sqlite:'. DATA . $this->db);
+				//$GLOBALS['dbh'] = new PDO('mysql:host=localhost;dbname=dbname', 'username', 'password');
 			} catch (PDOException $e) {
 				// Continue logic on a specific error code (14: unable to open database file)
 				$error = (string)$e->getCode();
@@ -129,7 +130,7 @@ class Model extends KISS_Model  {
 		foreach($this->rs as $k=>$v){
 			$result = $this->get($k);
 			// don't add data that 's returned as 'false'
-			if( $result ) $array[$k] = $result;
+			if( $result ) $array[$k] = ( is_string($result) ) ? stripslashes( $result ) : $result;
 		}
 		return $array;
 	}
@@ -305,6 +306,8 @@ class Controller extends KISS_Controller {
 		$path = ( substr($path, -1) == "/" ) ? substr($path, 0, -1) : $path;
 		// save the path for later use by controllers and helpers
 		$GLOBALS['path'] = $this->data['path'] = $path;
+		// save a reference to the endpoint
+		$this->_endpoint = $function;
 
 		// call the method
 		$this->$function($params);
@@ -332,13 +335,20 @@ class Controller extends KISS_Controller {
 	}
 
 	function render( $view=false) {
-		// include a default view for body sections
 		$class = strtolower( get_class($this) );
+		// #122 adding page info
+		if( !array_key_exists("_page", $this->data) ) $this->data["_page"] = array();
+		$this->data["_page"]['controller'] = $class;
+		$this->data["_page"]['view'] = $view or "";
+		// process custom body view (if available)
+		if( !$view ) $view = "body-". $this->_endpoint;
+		// include a default view for body sections
 		//$this->data["body"][$class]["view"] = ($view) ? getPath('views/'.$class.'/'. $view .'.php') : getPath('views/'.$class.'/body.php');
 		// get the actual path of the view
 		$view = getPath('views/'.$class.'/'. $view .'.php');
 		if( array_key_exists("body" , $this->data ) ){
 			foreach( $this->data["body"] as $k => $v ){
+				if( !is_array($v) ) $v = array();
 				if( !array_key_exists("view", $v) ){
 					$this->data["body"][$k]["view"] = ($view) ? $view : getPath('views/'.$class.'/body.php');
 				}

@@ -169,7 +169,10 @@ class Template extends KISS_View {
 			// strip out the php extension (if supplied)
 			$this->template = str_replace(".php", "", $template);
 		}
-		return TEMPLATES.$this->template.".php";
+		// #124 - fallback to the default template of the base folder
+		$default = realpath(BASE. "../public/templates/default.php");
+
+		return ( is_file(TEMPLATES.$this->template.".php") ) ? TEMPLATES.$this->template.".php" : $default;
 	}
 
 	// find the section a view file belongs to
@@ -214,7 +217,7 @@ class Template extends KISS_View {
 		if( is_file( $file ) ) $json = file_get_contents( $file );
 		$libs = ( !empty( $json ) ) ? json_decode($json, true) : array();
 
-		if( !DEBUG ){
+		if( $this->useRequire() ){
 			// merge the libs with the client globals
 			$GLOBALS['client']['require'] = array_merge($GLOBALS['client']['require'], $libs);
 		} else {
@@ -332,8 +335,12 @@ class Template extends KISS_View {
 	}
 
 	function trimWhitespace( $string ){
-		// replace multiple spaces with one
-		return preg_replace( '/\s+/', ' ', $string );
+		// replace multiple spaces with one (except textarea)
+		return preg_replace( '/(?:\s+(?![^<]*<\/(textarea|pre)>))/', ' ', $string );
+	}
+
+	function useRequire(){
+		return defined("REQUIRE") || !DEBUG;
 	}
 
 }

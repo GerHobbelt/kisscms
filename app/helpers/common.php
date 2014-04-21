@@ -59,7 +59,7 @@ function isStatic( $file ) {
 		if (is_dir(APP."plugins/") && $handle = opendir(APP."plugins/")) {
 			while (false !== ($plugin = readdir($handle))) {
 				if ($plugin == '.' || $plugin == '..') {
-				  continue;
+					continue;
 				}
 				if ( is_dir(APP."plugins/".$plugin) && file_exists( APP."plugins/".$plugin."/public/".$file ) ) {
 					$target = APP."plugins/".$plugin."/public/".$file;
@@ -74,10 +74,14 @@ function isStatic( $file ) {
 			$target = BASE."public/".$file;
 			return $target;
 		}
+		$target = realpath(BASE."../public/".$file);
+		if ( file_exists( $target ) ){
+			return $target;
+		}
 		if (is_dir(BASE."plugins/") && $handle = opendir(BASE."plugins/")) {
 			while (false !== ($plugin = readdir($handle))) {
 				if ($plugin == '.' || $plugin == '..') {
-				  continue;
+					continue;
 				}
 				if ( is_dir(BASE."plugins/".$plugin) && file_exists( BASE."plugins/".$plugin."/public/".$file ) ) {
 					$target = BASE."plugins/".$plugin."/public/".$file;
@@ -155,15 +159,6 @@ function getPath( $file ) {
 		$search = glob(APP."plugins/*/$file", GLOB_BRACE);
 		if($search) return array_pop($search);
 	}
-	// try the base folder if we didn't find anything
-	if( defined("BASE") ) {
-		// find the core file second
-		if (file_exists(BASE.$file)) return BASE.$file;
-		if (file_exists(BASE."plugins/$file")) return BASE."plugins/$file";
-		// check the plugins folder
-		$search = glob(BASE."plugins/*/$file", GLOB_BRACE);
-		if($search) return array_pop($search);
-	}
 	// check the plugins folder if we still haven't found anything
 	if( defined("PLUGINS") ){
 		// find the plugins file
@@ -178,6 +173,15 @@ function getPath( $file ) {
 		if (file_exists(SITE_ROOT ."/plugins/". $file)) return SITE_ROOT ."/plugins/". $file;
 		// check the plugins folder
 		$search = glob(SITE_ROOT ."/plugins/*/$file", GLOB_BRACE);
+		if($search) return array_pop($search);
+	}
+	// try the base folder if we didn't find anything
+	if( defined("BASE") ) {
+		// find the core file second
+		if (file_exists(BASE.$file)) return BASE.$file;
+		if (file_exists(BASE."plugins/$file")) return BASE."plugins/$file";
+		// check the plugins folder
+		$search = glob(BASE."plugins/*/$file", GLOB_BRACE);
 		if($search) return array_pop($search);
 	}
 	// nothing checks out...
