@@ -63,7 +63,7 @@ A few of the sites using this open source:
 
 ## Credits
 
-Lead Developer: Makis Tracend ( [@tracend](http://github.com/tracend) )
+Lead Developer: Makis Tracend ([@tracend](http://github.com/tracend))
 
 Distributed through [Makesites.org](http://www.makesites.org)
 

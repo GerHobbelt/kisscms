@@ -1,4 +1,4 @@
-<?php if(!empty($title)){ ?>
+<?php if (!empty($title)) { ?>
 <h2><?php echo $title; ?></h2>
 <?php } ?>
 

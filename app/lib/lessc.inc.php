@@ -535,7 +535,7 @@ class lessc {
 	}
 
 	// attempt to find blocks matched by path and args
-	protected function findBlocks($searchIn, $path, $args, $seen=array()) {
+	protected function findBlocks($searchIn, $path, $args, $seen = array()) {
 		if ($searchIn == null) return null;
 		if (isset($seen[$searchIn->id])) return null;
 		$seen[$searchIn->id] = true;
@@ -835,7 +835,7 @@ class lessc {
 			$color[1],$color[2], $color[3]);
 	}
 
-	protected function lib_argb($color){
+	protected function lib_argb($color) {
 		return $this->lib_rgbahex($color);
 	}
 
@@ -1354,7 +1354,7 @@ class lessc {
 				if (isset(self::$cssColors[$name])) {
 					$rgba = explode(',', self::$cssColors[$name]);
 
-					if(isset($rgba[3]))
+					if (isset($rgba[3]))
 						return array('color', $rgba[0], $rgba[1], $rgba[2], $rgba[3]);
 
 					return array('color', $rgba[0], $rgba[1], $rgba[2]);
@@ -1410,8 +1410,8 @@ class lessc {
 			return $this->toBool($left == self::$TRUE && $right == self::$TRUE);
 		}
 
-		if ($op == "=") {
-			return $this->toBool($this->eq($left, $right) );
+		if ($op == " = ") {
+			return $this->toBool($this->eq($left, $right));
 		}
 
 		if ($op == "+" && !is_null($str = $this->stringConcatenate($left, $right))) {
@@ -1502,7 +1502,7 @@ class lessc {
 		return $this->fixColor($out);
 	}
 
-	function lib_red($color){
+	function lib_red($color) {
 		$color = $this->coerceColor($color);
 		if (is_null($color)) {
 			$this->throwError('color expected for red()');
@@ -1511,7 +1511,7 @@ class lessc {
 		return $color[1];
 	}
 
-	function lib_green($color){
+	function lib_green($color) {
 		$color = $this->coerceColor($color);
 		if (is_null($color)) {
 			$this->throwError('color expected for green()');
@@ -1520,7 +1520,7 @@ class lessc {
 		return $color[2];
 	}
 
-	function lib_blue($color){
+	function lib_blue($color) {
 		$color = $this->coerceColor($color);
 		if (is_null($color)) {
 			$this->throwError('color expected for blue()');
@@ -1605,7 +1605,7 @@ class lessc {
 
 
 	// get the highest occurrence entry for a name
-	protected function get($name, $default=null) {
+	protected function get($name, $default = null) {
 		$current = $this->env;
 
 		$isArguments = $name == $this->vPrefix . 'arguments';
@@ -1746,7 +1746,7 @@ class lessc {
 				// specify the root to trigger a rebuild.
 				$root = $in['root'];
 			} elseif (isset($in['files']) and is_array($in['files'])) {
-				foreach ($in['files'] as $fname => $ftime ) {
+				foreach ($in['files'] as $fname => $ftime) {
 					if (!file_exists($fname) or filemtime($fname) > $ftime) {
 						// One of the files we knew about previously has changed
 						// so we should look at our incoming root again.
@@ -2049,7 +2049,7 @@ class lessc_parser {
 	static protected $precedence = array(
 		'=<' => 0,
 		'>=' => 0,
-		'=' => 0,
+		' = ' => 0,
 		'<' => 0,
 		'>' => 0,
 
@@ -2071,7 +2071,7 @@ class lessc_parser {
 	static protected $operatorString;
 
 	// these properties will supress division unless it's inside parenthases
-	static protected $supressDivisionProps =
+	static protected $supressDivisionProps = 
 		array('/border-radius$/i', '/^font$/i');
 
 	protected $blockDirectives = array("font-face", "keyframes", "page", "-moz-document", "viewport", "-moz-viewport", "-o-viewport", "-ms-viewport");
@@ -2101,7 +2101,7 @@ class lessc_parser {
 		$this->writeComments = false;
 
 		if (!self::$operatorString) {
-			self::$operatorString =
+			self::$operatorString = 
 				'('.implode('|', array_map(array('lessc', 'preg_quote'),
 					array_keys(self::$precedence))).')';
 
@@ -2615,7 +2615,7 @@ class lessc_parser {
 	}
 
 	// an unbounded string stopped by $end
-	protected function openString($end, &$out, $nestingOpen=null, $rejectStrs = null) {
+	protected function openString($end, &$out, $nestingOpen = null, $rejectStrs = null) {
 		$oldWhite = $this->eatWhiteDefault;
 		$this->eatWhiteDefault = false;
 
@@ -2999,8 +2999,8 @@ class lessc_parser {
 			while (true) {
 				$ss = $this->seek();
 				// this ugly nonsense is for ie filter properties
-				if ($this->keyword($name) && $this->literal('=') && $this->expressionList($value)) {
-					$args[] = array("string", "", array($name, "=", $value));
+				if ($this->keyword($name) && $this->literal(' = ') && $this->expressionList($value)) {
+					$args[] = array("string", "", array($name, " = ", $value));
 				} else {
 					$this->seek($ss);
 					if ($this->expressionList($value)) {
@@ -3054,7 +3054,7 @@ class lessc_parser {
 	 */
 	protected function assign($name = null) {
 		if ($name) $this->currentProperty = $name;
-		return $this->literal(':') || $this->literal('=');
+		return $this->literal(':') || $this->literal(' = ');
 	}
 
 	// consume a keyword
@@ -3159,7 +3159,7 @@ class lessc_parser {
 		return $this->match(self::$literalCache[$what], $m, $eatWhitespace);
 	}
 
-	protected function genericList(&$out, $parseItem, $delim="", $flatten=true) {
+	protected function genericList(&$out, $parseItem, $delim = "", $flatten = true) {
 		$s = $this->seek();
 		$items = array();
 		while ($this->$parseItem($value)) {
@@ -3232,7 +3232,7 @@ class lessc_parser {
 	}
 
 	// match something without consuming it
-	protected function peek($regex, &$out = null, $from=null) {
+	protected function peek($regex, &$out = null, $from = null) {
 		if (is_null($from)) $from = $this->count;
 		$r = '/'.$regex.'/Ais';
 		$result = preg_match($r, $this->buffer, $out, null, $from);
@@ -3269,7 +3269,7 @@ class lessc_parser {
 		}
 	}
 
-	protected function pushBlock($selectors=null, $type=null) {
+	protected function pushBlock($selectors = null, $type = null) {
 		$b = new stdclass;
 		$b->parent = $this->env;
 

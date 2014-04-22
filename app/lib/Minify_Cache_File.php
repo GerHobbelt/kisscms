@@ -8,7 +8,7 @@ class Minify_Cache_File {
     
     public function __construct($path = '', $fileLocking = false)
     {
-        if (! $path) {
+        if (!$path) {
             $path = self::tmp();
         }
         $this->_locking = $fileLocking;
@@ -30,7 +30,7 @@ class Minify_Cache_File {
             ? LOCK_EX
             : null;
         $file = $this->_path . '/' . $id;
-        if (! @file_put_contents($file, $data, $flag)) {
+        if (!@file_put_contents($file, $data, $flag)) {
             $this->_log("Minify_Cache_File: Write failed to '$file'");
         }
         // write control
@@ -131,8 +131,8 @@ class Minify_Cache_File {
     public static function tmp()
     {
         static $tmp = null;
-        if (! $tmp) {
-            $tmp = ( !defined("SHARED") && function_exists('sys_get_temp_dir') )
+        if (!$tmp) {
+            $tmp = (!defined("SHARED") && function_exists('sys_get_temp_dir'))
                 ? sys_get_temp_dir()
                 : self::_tmp();
             $tmp = rtrim($tmp, DIRECTORY_SEPARATOR);
@@ -152,7 +152,7 @@ class Minify_Cache_File {
     protected static function _tmp()
     {
         // non-Windows system?
-        if (strtolower(substr(PHP_OS, 0, 3)) != 'win') {
+        if (strtolower(substr(PHP_OS, 0, 3)) !== 'win') {
             $tmp = empty($_ENV['TMPDIR']) ? getenv('TMPDIR') : $_ENV['TMPDIR'];
             if ($tmp) {
                 return $tmp;

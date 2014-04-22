@@ -4,7 +4,7 @@
 // Pages Initialization 
 //===============================================
 
-if( class_exists('Page') && method_exists(new Page(),'register')){ 
+if (class_exists('Page') && method_exists(new Page(),'register')) { 
 	// Register variables
 	Page::register("1", "title", "Welcome");
 	Page::register("1", "content", "Content Reset... If this was by mistake please restore your database.");

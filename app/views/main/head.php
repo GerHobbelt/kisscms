@@ -40,12 +40,12 @@ Object.extend = function(destination, source) {
 	return destination;
 };
 
-<?php if (DEBUG){ ?>
+<?php if (DEBUG) { ?>
 
 	var DEBUG = true;
 
 	// raw out put of the client side vars
-	Object.extend(KISSCMS, <?php echo json_encode_escaped( $GLOBALS['client'] ); ?>);
+	Object.extend(KISSCMS, <?php echo json_encode_escaped($GLOBALS['client']); ?>);
 
 <?php } ?>
 

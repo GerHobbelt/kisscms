@@ -51,7 +51,7 @@ class sfYamlDumper
           $isAHash ? sfYamlInline::dump($key).':' : '-',
           $willBeInlined ? ' ' : "\n",
           $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + 2)
-        ).($willBeInlined ? "\n" : '');
+       ).($willBeInlined ? "\n" : '');
       }
     }
 

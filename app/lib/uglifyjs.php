@@ -8,7 +8,6 @@
  * Released under the [Apache License v2.0](http://makesites.org/licenses/APACHE-2.0)
  */
 class UglifyJS {
-
 	var $_srcs = array();
 	var $_mode = "WHITESPACE_ONLY";
 	var $_warning_level = "DEFAULT";
@@ -42,21 +41,21 @@ class UglifyJS {
 		return $this;
 	}
 
-	function compiler( $string ) {
+	function compiler($string) {
 		// get the previous compiler
 		$compiler = $this->_compiler;
-		$url = parse_url( $string );
+		$url = parse_url($string);
 		// gather vars
-		if( array_key_exists("host", $url) ) $compiler['host'] = $url['host'];
-		if( array_key_exists("port", $url) ) $compiler['port'] = $url['port'];
-		if( array_key_exists("path", $url) ) $compiler['path'] = $url['path'];
+		if (array_key_exists("host", $url)) $compiler['host'] = $url['host'];
+		if (array_key_exists("port", $url)) $compiler['port'] = $url['port'];
+		if (array_key_exists("path", $url)) $compiler['path'] = $url['path'];
 		// save back the compiler
 		$this->_compiler = $compiler;
 		return $compiler;
 	}
 
-	function setFile( $name=false ) {
-		if($name) $this->_file = $name;
+	function setFile($name = false) {
+		if ($name) $this->_file = $name;
 		return $this;
 	}
 	/**
@@ -163,23 +162,21 @@ class UglifyJS {
 	 * Writes the compiled response.  Reading from either the cache, or
 	 * invoking a recompile, if necessary.
 	 */
-	function write( $output=false ) {
-
+	function write($output = false) {
 		// No cache directory so just dump the output.
 		if ($this->_cache_dir == "") {
 			echo $this->_compile();
-
 		} else {
 			$cache_file = $this->_getCacheFileName();
 			if ($this->_isRecompileNeeded($cache_file)) {
 				$result = $this->_compile();
 				file_put_contents($cache_file, $result);
-				if( $output ){
+				if ($output) {
 					echo $result;
 				}
 			} else {
 				// No recompile needed, but see if we need to output the cached file.
-				if( $output ){
+				if ($output) {
 					// Read the cache file and send it to the client.
 					echo file_get_contents($cache_file);
 				}
@@ -216,7 +213,7 @@ class UglifyJS {
 	}
 
 	function _getCacheFileName() {
-		return ( empty($this->_file) ) ? $this->_cache_dir . $this->_getHash() . ".js" : $this->_cache_dir . $this->_file. ".js";
+		return (empty($this->_file)) ? $this->_cache_dir . $this->_getHash() . ".js" : $this->_cache_dir . $this->_file. ".js";
 	}
 
 	function _getHash() {
@@ -230,7 +227,7 @@ class UglifyJS {
 	function _getParams() {
 		$params = array();
 		foreach ($this->_getParamList() as $key => $value) {
-			$params[] = preg_replace("/_[0-9]$/", "", $key) . "=" . urlencode($value);
+			$params[] = preg_replace("/_[0-9]$/", "", $key) . " = " . urlencode($value);
 		}
 		return implode("&", $params);
 	}
@@ -240,7 +237,7 @@ class UglifyJS {
 		if ($this->_code_url_prefix) {
 			// Send the URL to each source file instead of the raw source.
 			$i = 0;
-			foreach($this->_srcs as $file){
+			foreach ($this->_srcs as $file) {
 				$params["code_url_$i"] = $this->_code_url_prefix . $file;
 				$i++;
 			}
@@ -279,7 +276,7 @@ class UglifyJS {
 			fputs($fp, "Host: $host\r\n");
 			fputs($fp, "Referer: $referer\r\n");
 			fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
-			fputs($fp, "Content-length: ". strlen($data) ."\r\n");
+			fputs($fp, "Content-length: " . strlen($data) . "\r\n");
 			fputs($fp, "Connection: close\r\n\r\n");
 			fputs($fp, $data);
 
@@ -291,7 +288,7 @@ class UglifyJS {
 			fclose($fp);
 		}
 
-		$data = substr($result, (strpos($result, "\r\n\r\n")+4));
+		$data = substr($result, strpos($result, "\r\n\r\n") + 4);
 		if (strpos(strtolower($result), "transfer-encoding: chunked") !== FALSE) {
 			$data = $this->_unchunk($data);
 		}
@@ -312,5 +309,4 @@ class UglifyJS {
 		}
 		return $outData;
 	}
-
 }

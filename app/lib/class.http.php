@@ -596,17 +596,17 @@ class Http
         }
         
         // Process data, if presented
-        if(is_array($this->params) && count($this->params) > 0)
+        if (is_array($this->params) && count($this->params) > 0)
         {
             // Get a blank slate
             $tempString = array();
             
-            // Convert data array into a query string (ie animal=dog&sport=baseball)
+            // Convert data array into a query string (ie animal = dog&sport = baseball)
             foreach ($this->params as $key => $value) 
             {
-                if(strlen(trim($value))>0)
+                if (strlen(trim($value))>0)
                 {
-                    $tempString[] = $key . "=" . urlencode($value);
+                    $tempString[] = $key . " = " . urlencode($value);
                 }
             }
             
@@ -617,9 +617,9 @@ class Http
         $this->useCurl = $this->useCurl && in_array('curl', get_loaded_extensions());
         
         // GET method configuration
-        if($this->method == 'GET')
+        if ($this->method == 'GET')
         {
-            if(isset($queryString))
+            if (isset($queryString))
             {
                 $this->target = $this->target . "?" . $queryString;
             }
@@ -648,17 +648,17 @@ class Http
         $this->_passCookies();
         
         // Process cookies, if requested
-        if(is_array($this->cookies) && count($this->cookies) > 0)
+        if (is_array($this->cookies) && count($this->cookies) > 0)
         {
             // Get a blank slate
             $tempString   = array();
             
-            // Convert cookiesa array into a query string (ie animal=dog&sport=baseball)
+            // Convert cookiesa array into a query string (ie animal = dog&sport = baseball)
             foreach ($this->cookies as $key => $value) 
             {
-                if(strlen(trim($value)) > 0)
+                if (strlen(trim($value)) > 0)
                 {
-                    $tempString[] = $key . "=" . urlencode($value);
+                    $tempString[] = $key . " = " . urlencode($value);
                 }
             }
             
@@ -672,7 +672,7 @@ class Http
             $ch = curl_init();
     
             // GET method configuration
-            if($this->method == 'GET')
+            if ($this->method == 'GET')
             {
                 curl_setopt ($ch, CURLOPT_HTTPGET, TRUE); 
                 curl_setopt ($ch, CURLOPT_POST, FALSE); 
@@ -680,7 +680,7 @@ class Http
             // POST method configuration
             else
             {
-                if(isset($queryString))
+                if (isset($queryString))
                 {
                     curl_setopt ($ch, CURLOPT_POSTFIELDS, $queryString);
                 }
@@ -696,7 +696,7 @@ class Http
             }
             
             // Custom cookie configuration
-            if($this->useCookie && isset($cookieString))
+            if ($this->useCookie && isset($cookieString))
             {
                 curl_setopt ($ch, CURLOPT_COOKIE, $cookieString);
             }
@@ -895,10 +895,10 @@ class Http
         $this->_clearHeaders();
         
         // Get resposne status
-        if($this->status == 0)
+        if ($this->status == 0)
         {
             // Oooops !
-            if(!preg_match_all("|^http/[0-9]+\\.[0-9]+[ \t]+([0-9]+)[ \t]*(.*)\$|i", $headers[0], $matches))
+            if (!preg_match_all("|^http/[0-9]+\\.[0-9]+[ \t]+([0-9]+)[ \t]*(.*)\$|i", $headers[0], $matches))
             {
                 $this->_setError('Unexpected HTTP response status');
                 return FALSE;
@@ -917,9 +917,9 @@ class Http
             $headerValue = trim(chop($this->_tokenize("\r\n")));
             
             // If its already there, then add as an array. Otherwise, just keep there
-            if(isset($this->headers[$headerName]))
+            if (isset($this->headers[$headerName]))
             {
-                if(gettype($this->headers[$headerName]) == "string")
+                if (gettype($this->headers[$headerName]) == "string")
                 {
                     $this->headers[$headerName] = array($this->headers[$headerName]);
                 }
@@ -961,7 +961,7 @@ class Http
     function _parseCookie()
     {
         // Get the cookie header as array
-        if(gettype($this->headers['set-cookie']) == "array")
+        if (gettype($this->headers['set-cookie']) == "array")
         {
             $cookieHeaders = $this->headers['set-cookie'];
         }
@@ -973,7 +973,7 @@ class Http
         // Loop through the cookies
         for ($cookie = 0; $cookie < count($cookieHeaders); $cookie++)
         {
-            $cookieName  = trim($this->_tokenize($cookieHeaders[$cookie], "="));
+            $cookieName  = trim($this->_tokenize($cookieHeaders[$cookie], " = "));
             $cookieValue = $this->_tokenize(";");
             
             $urlParsed   = parse_url($this->target);
@@ -984,7 +984,7 @@ class Http
             $path        = "/";
             $expires     = "";
             
-            while(($name = trim(urldecode($this->_tokenize("=")))) != "")
+            while(($name = trim(urldecode($this->_tokenize(" = ")))) != "")
             {
                 $value = urldecode($this->_tokenize(";"));
                 
@@ -1018,24 +1018,24 @@ class Http
      */
     function _setCookie($name, $value, $expires = "" , $path = "/" , $domain = "" , $secure = 0)
     {
-        if(strlen($name) == 0)
+        if (strlen($name) == 0)
         {
             return($this->_setError("No valid cookie name was specified."));
         }
 
-        if(strlen($path) == 0 || strcmp($path[0], "/"))
+        if (strlen($path) == 0 || strcmp($path[0], "/"))
         {
             return($this->_setError("$path is not a valid path for setting cookie $name."));
         }
             
-        if($domain == "" || !strpos($domain, ".", $domain[0] == "." ? 1 : 0))
+        if ($domain == "" || !strpos($domain, ".", $domain[0] == "." ? 1 : 0))
         {
             return($this->_setError("$domain is not a valid domain for setting cookie $name."));
         }
         
         $domain = strtolower($domain);
         
-        if(!strcmp($domain[0], "."))
+        if (!strcmp($domain[0], "."))
         {
             $domain = substr($domain, 1);
         }
@@ -1045,13 +1045,13 @@ class Http
         
         $secure = intval($secure);
         
-        $this->_cookies[] = array( "name"      =>  $name,
+        $this->_cookies[] = array("name"      =>  $name,
                                    "value"     =>  $value,
                                    "domain"    =>  $domain,
                                    "path"      =>  $path,
                                    "expires"   =>  $expires,
                                    "secure"    =>  $secure
-                                 );
+                                );
     }
     
     /**
@@ -1064,7 +1064,7 @@ class Http
      */
     function _encodeCookie($value, $name)
     {
-        return($name ? str_replace("=", "%25", $value) : str_replace(";", "%3B", $value));
+        return($name ? str_replace(" = ", "%25", $value) : str_replace(";", "%3B", $value));
     }
     
     /**
@@ -1083,7 +1083,7 @@ class Http
             $urlParsed = parse_url($this->target);
             $tempCookies = array();
             
-            foreach($this->_cookies as $cookie)
+            foreach ($this->_cookies as $cookie)
             {
                 if ($this->_domainMatch($urlParsed['host'], $cookie['domain']) && (0 === strpos($urlParsed['path'], $cookie['path']))
                     && (empty($cookie['secure']) || $urlParsed['protocol'] == 'https')) 
@@ -1127,7 +1127,7 @@ class Http
         } 
         else 
         {
-            return substr('.'. $requestHost, - strlen($cookieDomain)) == $cookieDomain;
+            return substr('.' . $requestHost, - strlen($cookieDomain)) == $cookieDomain;
         }
     }
     
@@ -1145,21 +1145,21 @@ class Http
      */
     function _tokenize($string, $separator = '')
     {
-        if(!strcmp($separator, ''))
+        if (!strcmp($separator, ''))
         {
             $separator = $string;
             $string = $this->nextToken;
         }
         
-        for($character = 0; $character < strlen($separator); $character++)
+        for ($character = 0; $character < strlen($separator); $character++)
         {
-            if(gettype($position = strpos($string, $separator[$character])) == "integer")
+            if (gettype($position = strpos($string, $separator[$character])) == "integer")
             {
                 $found = (isset($found) ? min($found, $position) : $position);
             }
         }
         
-        if(isset($found))
+        if (isset($found))
         {
             $this->nextToken = substr($string, $found + 1);
             return(substr($string, 0, $found));

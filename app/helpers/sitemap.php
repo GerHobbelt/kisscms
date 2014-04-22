@@ -1,34 +1,33 @@
 <?php
 
 class Sitemap {
-
 	public $data;
 
-	function __construct(){
+	function __construct() {
 		$this->data['items'] = $this->getItems();
 		$this->render();
 	}
 
-	private function getItems(){
+	private function getItems() {
 		$items = array();
 
-		if( array_key_exists('db_pages', $GLOBALS) ){
+		if (array_key_exists('db_pages', $GLOBALS)) {
 			$dbh = $GLOBALS['db_pages'];
 			$sql = 'SELECT * FROM "pages" ORDER BY "date" DESC';
 			$results = $dbh->query($sql);
 			while ($v = $results->fetch(PDO::FETCH_ASSOC)) {
-				$url = $this->makeUrlString( $v );
-				$date = $this->makeIso8601TimeStamp( $v );
-				$frequency = $this->getFrequency( $v);
-				$priority = $this->getPriority( $v );
-				$items[] = array( 'url' =>  $url, 'date' => $date, 'frequency' => $frequency, 'priority' => $priority );
+				$url = $this->makeUrlString($v);
+				$date = $this->makeIso8601TimeStamp($v);
+				$frequency = $this->getFrequency($v);
+				$priority = $this->getPriority($v);
+				$items[] = array('url' =>  $url, 'date' => $date, 'frequency' => $frequency, 'priority' => $priority);
 			}
 		}
 		return $items;
 	}
 
 	function makeUrlString($item) {
-		$url = htmlentities( url( $item['path'] ), ENT_QUOTES, 'UTF-8');
+		$url = htmlentities(url($item['path']), ENT_QUOTES, 'UTF-8');
 		return $url;
 	}
 
@@ -36,8 +35,8 @@ class Sitemap {
 		$dateTime = $item['date'];
 
 		if (is_numeric(substr($dateTime, 11, 1))) {
-			$isoTS = substr($dateTime, 0, 10) ."T"
-					 .substr($dateTime, 11, 8) ."+00:00";
+			$isoTS = substr($dateTime, 0, 10) . "T"
+					 .substr($dateTime, 11, 8) . "+00:00";
 		}
 		else {
 			$isoTS = substr($dateTime, 0, 10);
@@ -45,29 +44,28 @@ class Sitemap {
 		return $isoTS;
 	}
 
-	function getFrequency( $item ) {
-
+	function getFrequency($item) {
 		$now = date('Y-m-d H:i:s');
 		$last_update = $item['date'];
 		// a precaution due to server timezone differences
-		if( strtotime( $last_update ) >= strtotime( $now ) )
+		if (strtotime($last_update) >= strtotime($now))
 		{
 			$now = $last_update;
 		}
 
-		$diff = get_time_difference( $last_update, $now );
+		$diff = get_time_difference($last_update, $now);
 
-		if($diff['days'] > 365){
+		if ($diff['days'] > 365) {
 			$frequency = 'yearly';
-		}elseif($diff['days'] > 30){
+		}elseif($diff['days'] > 30) {
 			$frequency = 'monthly';
-		}elseif($diff['days'] > 7){
+		}elseif($diff['days'] > 7) {
 			$frequency = 'weekly';
-		}elseif($diff['days'] > 0){
+		}elseif($diff['days'] > 0) {
 			$frequency = 'daily';
-		}elseif($diff['days'] == 0 && $diff['hours'] != 0){
+		}elseif($diff['days'] == 0 && $diff['hours'] != 0) {
 			$frequency = 'hourly';
-		}elseif($diff['days'] == 0 && $diff['hours'] == 0){
+		}elseif($diff['days'] == 0 && $diff['hours'] == 0) {
 			$frequency = 'always';
 		} else {
 			$frequency = 'never';
@@ -76,17 +74,16 @@ class Sitemap {
 		return $frequency;
 	}
 
-	function getPriority( $item ) {
-		$path = explode("/", $item['path'] );
+	function getPriority($item) {
+		$path = explode("/", $item['path']);
 		// calculate a number from 0 to 1, based on the tree structure
 		$priority = 1 - (count($path) -1);
 
 		return $priority;
 	}
 
-	function render(){
-
-		$output = View::do_fetch( getPath('views/main/sitemap.php'), $this->data);
+	function render() {
+		$output = View::do_fetch(getPath('views/main/sitemap.php'), $this->data);
 		// write the sitemap
 		writeFile(APP.'public/sitemap.xml', $output, 'w');
 		// write the compressed sitemap
@@ -95,5 +92,4 @@ class Sitemap {
 		// view the Sitemap XML
 		//header('Location: ./sitemap.xml');
 	}
-
 }

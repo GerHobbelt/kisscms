@@ -1,10 +1,10 @@
 {
 	"paths": {
 		"jquery": [
-			"//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min"
+			"js/libs/jquery"
 		],
 		"json2": [
-			"//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2"
+			"js/libs/json2"
 		]
 	},
 	"shim": {

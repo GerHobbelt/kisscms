@@ -5,8 +5,7 @@
 // KISSCMS Settings
 //===============================================
 
-if( class_exists('Config') && method_exists(new Config(),'register')){
-
+if (class_exists('Config') && method_exists(new Config(),'register')) {
 	// Register variables
 	Config::register("main", "site_name", "KISSCMS");
 	Config::register("main", "site_description", "Lightweight CMS based on the KISSMVC Framework");

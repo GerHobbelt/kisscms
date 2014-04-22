@@ -2,7 +2,7 @@
 // create a fallback for the variables we are using
 $title = (!isset($title)) ? '' : $title;
 $content = (!isset($content)) ? '' : $content;
-$action = ( $status == "create" ) ? url("admin/update", true) : url("admin/update/id/$id", true);
+$action = ($status == "create") ? url("admin/update", true) : url("admin/update/id/$id", true);
 ?>
 
 <h2><?php echo $GLOBALS['language'][$status.'_title']; ?></h2>
@@ -36,7 +36,7 @@ $action = ( $status == "create" ) ? url("admin/update", true) : url("admin/updat
 <script type="text/javascript" src="<?php echo url('/js/plugins/tag-it.js'); ?>" data-type="require" data-path="tag-it" data-deps="jquery-ui-autocomplete"></script>
 <script type="text/javascript" data-type="require" data-deps="tag-it">
 
-	$(function(){
+	$(function() {
 		$(".cms-form #tags").tagit({
 			availableTags: []
 		});
