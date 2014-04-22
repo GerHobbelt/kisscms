@@ -253,7 +253,7 @@ class Controller extends KISS_Controller {
 	function client_js() {
 		// container
 		if( !array_key_exists("_client", $_SESSION) || !is_array($_SESSION["_client"]) )
-				$_SESSION["_client"] = array();
+			$_SESSION["_client"] = array();
 		//
 		$path = null;
 		if( !empty( $_SERVER["HTTP_REFERER"] ) ){
@@ -277,8 +277,8 @@ class Controller extends KISS_Controller {
 		$url_parts = parse_url($url);
 		$requri = ( array_key_exists("path", $url_parts) ) ? $url_parts['path'] : "";
 		// remove the first slash from the URI so the controller is always the first item in the array (later)
-		if (strpos($requri,$this->web_folder)===0)
-			$requri=substr($requri,strlen($this->web_folder));
+		if (strpos($requri, $this->web_folder) === 0)
+			$requri = substr($requri, strlen($this->web_folder));
 		// FIX: allow for controller names with extensions
 		$requri = str_replace(".", "_", $requri);
 		$request["uri_parts"] = $requri ? explode('/', $requri) : array();
@@ -304,7 +304,7 @@ class Controller extends KISS_Controller {
 		}
 
 		// handle requests encoded as application/json
-		if (array_key_exists("CONTENT_TYPE",$_SERVER) && stripos($_SERVER["CONTENT_TYPE"], "application/json")===0) {
+		if (array_key_exists("CONTENT_TYPE", $_SERVER) && stripos($_SERVER["CONTENT_TYPE"], "application/json") === 0) {
 			$json = json_decode(file_get_contents("php://input"));
 			$request["json"] = array();
 			foreach( $json as $k => $v ){
@@ -313,8 +313,7 @@ class Controller extends KISS_Controller {
 			}
 		}
 
-
-		$this->request_uri_parts =  $request;
+		$this->request_uri_parts = $request;
 
 		return $this;
 	}
@@ -350,7 +349,6 @@ class Controller extends KISS_Controller {
 		if (!preg_match('#^[A-Za-z_][A-Za-z0-9_-]*$#',$function) || !method_exists($this, $function))
 			$this->request_not_found();
 
-
 		// calculate the path - possibly this can be merged with parse_http_request()
 		$path = preg_replace('#^'.addslashes(WEB_FOLDER).'#', '', $_SERVER['REQUEST_URI']);
 		// check if we have a trailing slash (and remove it)
@@ -367,7 +365,7 @@ class Controller extends KISS_Controller {
 
 	//Example of overriding a core class method with your own
 	function request_not_found() {
-		die(View::do_fetch(  getPath('views/errors/404.php') ));
+		die(View::do_fetch( getPath('views/errors/404.php') ));
 	}
 
 	function require_login() {
@@ -376,7 +374,7 @@ class Controller extends KISS_Controller {
 	}
 
 	function redirect($path, $window=false) {
-		if($window != "top"){
+		if($window != "top") {
 			header('Location: '.url($path));
 		} else {
 			echo "<script type='text/javascript'>top.location.href = '". $path ."';</script>";
@@ -414,13 +412,12 @@ class Controller extends KISS_Controller {
 	}
 
 	// this function takes an array and creates pairs of key-value
-	function normalize_params( $params, $remove){
-
+	function normalize_params( $params, $remove) {
 		// create a new key/value array
 		$normalized = array();
 
 		// first remove the picked route
-		if( !empty($remove) ){
+		if( !empty($remove) ) {
 			// route is either part of the path or the query
 			// remove the selected route from the request
 			if( !empty($params["uri_parts"]) ){
@@ -431,11 +428,10 @@ class Controller extends KISS_Controller {
 		}
 
 		//loop through the groups of params
-		foreach( $params as $type => $group ){
-
-			while ( $param = current($group) ){
+		foreach( $params as $type => $group ) {
+			while ( $param = current($group) ) {
 				$next = next($group);
-				if( $next === false ){
+				if( $next === false ) {
 					 $normalized[] = $param;
 				} else {
 					$key = $param;
@@ -444,7 +440,6 @@ class Controller extends KISS_Controller {
 					$normalized[ $key ] = $value;
 					next($group);
 				}
-
 			}
 		}
 
@@ -452,15 +447,14 @@ class Controller extends KISS_Controller {
 		$params = $normalized;
 
 		// return false if there are no params
-		if( count($params)==0 ) {
+		if( count($params) === 0 ) {
 			$params = false;
 		// convert the params to a string if they are only one element
-		} else if( count($params)==1 && isset($params[0]) ) {
+		} else if( count($params) === 1 && isset($params[0]) ) {
 			$params = implode($params);
 		}
 
 		return $params;
-
 	}
 
 	/**
@@ -475,7 +469,6 @@ class Controller extends KISS_Controller {
 	 *
 	 */
 	function cors() {
-
 		// Allow from any origin
 		if ( isset($_SERVER['HTTP_ORIGIN']) ) {
 			header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
@@ -483,10 +476,9 @@ class Controller extends KISS_Controller {
 		} else {
 			header("Access-Control-Allow-Origin: *");
 		}
-			header("Access-Control-Allow-Headers: X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-PINGOTHER");
-			header("Access-Control-Max-Age: 86400");    // cache for 1 day
-			header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-
+		header("Access-Control-Allow-Headers: X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-PINGOTHER");
+		header("Access-Control-Max-Age: 86400");    // cache for 1 day
+		header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 	}
 }
 
@@ -498,7 +490,7 @@ class View extends KISS_View {
 	//Example of overriding a constructor/method, add some code then pass control back to parent
 	function __construct($file='',$vars='') {
 		$file =  getPath('views/'.$file);
-		return parent::__construct($file,$vars);
+		return parent::__construct($file, $vars);
 	}
 
 }
