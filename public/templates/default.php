@@ -9,7 +9,7 @@
 
 </head>
 
-<body class="<?php echo $_page['view']; ?>">
+<body class="<?php if (!empty($_page)) { echo $_page['view']; } else { echo '*** buggy template use ***'; } ?>">
 
 <div class="page">
 	<header>

@@ -1,16 +1,16 @@
 {
 	"paths": {
 		"jquery": [
-			"js/libs/jquery"
+			"assets/libs/jquery"
 		],
-		"json2": [
-			"js/libs/json2"
+		"json3": [
+			"assets/libs/json3"
 		]
 	},
 	"shim": {
 	},
 	"deps": [
 		"jquery",
-		"json2"
+		"json3"
 	]
 }

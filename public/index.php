@@ -13,6 +13,20 @@ if (!defined('BASE_PATH'))
 }
 
 
+ini_set("error_prepend_string", "\n\n<!-- error_prepend_string --></head><html><body></td></tr></table></td></tr></table></div></div></div></div></div></div></div></div></div><div class='php-engine-error-report-prelude' style='height: 50px; width: 100%; background: red; margin: 5px;' >&nbsp;</div>\n\n\n<div class='php-engine-error-report-prelude' style='height: 50px; width: 100%; background: red; margin: 5px;' >");
+
+
+/* Set internal character encoding to UTF-8 */
+if (function_exists("mb_internal_encoding"))
+{
+    mb_internal_encoding("UTF-8");
+}
+
+
+
+
+
+
 
 //===============================================
 // ENVIRONMENT SETUP
@@ -64,7 +78,7 @@ function KISSCMS() {
 	}
 
 	require_once('../../__extra__/common.inc.php');
-	dump_request_to_logfile();
+	//dump_request_to_logfile();
 
 	if ($error_flagged) {
 		die("Environment variables not setup properly. Open " . $env_file_path . " and edit as needed...\n<br/>\n<br/>" . implode("\n<br/>", $errmsg));

@@ -26,7 +26,7 @@ class Template extends KISS_View {
 	public static function output($vars = '') {
 		$template = new Template($vars);
 		// first thing, check if there's a cached version of the template
-		$ id="html/" . $_SERVER['HTTP_HOST'] . "_" . $template->hash;
+		$id = "html/" . $_SERVER['HTTP_HOST'] . "_" . $template->hash;
 		$cache = self::getCache($id);
 		//$cache = false;
 		if ($cache && !DEBUG) { echo $cache; return; }
