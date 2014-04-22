@@ -94,20 +94,20 @@ class KISS_Controller {
 // For plain .php templates
 //===============================================================
 class KISS_View {
-  public $file='';
-  public $vars=array();
+	public $file='';
+	public $vars=array();
 
-  function __construct($file='',$vars='')  {
-    if ($file)
-      $this->file = $file;
-    if (is_array($vars))
-      $this->vars=$vars;
-    return $this;
-  }
+	function __construct($file='',$vars='')  {
+		if ($file)
+			$this->file = $file;
+		if (is_array($vars))
+			$this->vars=$vars;
+		return $this;
+	}
 
-  function __set($key,$var) {
-    return $this->set($key,$var);
-  }
+	function __set($key,$var) {
+		return $this->set($key,$var);
+	}
 
 	function set($key,$var) {
 		$this->vars[$key]=$var;
@@ -119,21 +119,21 @@ class KISS_View {
 		$this->vars[$key][]=$var;
 	}
 
-  function fetch($vars='') {
-    if (is_array($vars))
-      $this->vars=array_merge($this->vars,$vars);
-    extract($this->vars);
-    ob_start();
-    require($this->file);
-    return ob_get_clean();
-  }
+	function fetch($vars='') {
+		if (is_array($vars))
+			$this->vars=array_merge($this->vars,$vars);
+		extract($this->vars);
+		ob_start();
+		require($this->file);
+		return ob_get_clean();
+	}
 
-  function dump($vars='') {
-    if (is_array($vars))
-      $this->vars=array_merge($this->vars,$vars);
-    extract($this->vars);
-    require($this->file);
-  }
+	function dump($vars='') {
+		if (is_array($vars))
+			$this->vars=array_merge($this->vars,$vars);
+		extract($this->vars);
+		require($this->file);
+	}
 
 	static function do_fetch($file='',$vars='') {
 		if (is_array($vars))

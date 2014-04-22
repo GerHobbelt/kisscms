@@ -201,7 +201,6 @@ class Template extends KISS_View {
 
 	// this method compiles vars that need to be available on the client
 	function setupClient(){
-
 		// make this a config option?
 		$baseUrl =  "assets/js/";
 		// precaution(s) in case this is the first time we are accessing the client globals (not needed?)
@@ -253,7 +252,6 @@ class Template extends KISS_View {
 				$head->appendChild($script);
 				unset($this->client['require']['paths'][$name]);
 			}
-
 		}
 		// render the global client vars
 		$client .= 'Object.extend(KISSCMS, '. json_encode_escaped( $GLOBALS['client'] ) .');';
