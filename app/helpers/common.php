@@ -40,7 +40,7 @@ function findController($url) {
 // Get the output from the file in the public folders
 function isStatic( $file ) {
 	// FIX: Bail out if this is the root
-	if( $file == WEB_FOLDER) return false;
+	if ($file == WEB_FOLDER) return false;
 	// FIX: clean webfolder from path before comparing
 	$file = preg_replace('#^'.addslashes(WEB_FOLDER).'#', '', $file);
 	$root = rtrim($_SERVER['DOCUMENT_ROOT'],"/")."/";
@@ -191,12 +191,13 @@ function getPath( $file ) {
 function url($file='', $cdn=false){
 	// get the full uri for the file
 	$uri = uri($file);
+	$static_uri = isStatic( $uri );
+
 	// check if it is a static
-	if( $cdn && defined("CDN") && isStatic( $uri )){
+	if( $cdn && defined("CDN") && $static_uri){
 		// load the cdn address instead
 		// remove trailing slash, if any
 		$domain = ( substr(CDN, -1) == "/" ) ? substr(CDN, 0, -1) : CDN;
-
 	} else {
 		// check if this is a secure connection
 		$domain = ( $_SERVER['SERVER_PORT'] == "443" || (defined('SSL') && SSL) ) ? 'https://' : 'http://';
@@ -206,10 +207,11 @@ function url($file='', $cdn=false){
 		/*if( $_SERVER['SERVER_PORT'] != "80" && $_SERVER['SERVER_PORT'] != "443" ){
 			$domain .= ":".$_SERVER['SERVER_PORT'];
 		}*/
+		$domain = '';
 	}
 
 	// add the uri
-	$url = $domain . $uri;
+	$url = $domain . ($static_uri === false ? $uri : $static_uri);
 
 	return $url;
 }
