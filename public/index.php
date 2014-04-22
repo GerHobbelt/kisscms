@@ -13,9 +13,10 @@ Dual-licensed under the MIT/X11 license and the GNU General Public License (GPL)
 // 
 // Purpose: keep work variables in local scope while the configuration file is processed.
 function KISSCMS() {
-	$errmsg = false;
+	$errmsg = [];
+	$error_flagged = false;
 	$server_settings_found = false;
-	$env_file_path = ( file_exists("../env.local.json") ? "../env.local.json" : file_exists("env.local.json") ? "env.local.json" : file_exists("../env.json") ? "../env.json" : "env.json" );
+	$env_file_path = ( file_exists("../env.local.json") ? "../env.local.json" : ( file_exists("env.local.json") ? "env.local.json" : ( file_exists("../env.json") ? "../env.json" : "env.json" )));
 	$ENV = json_decode( file_get_contents( $env_file_path ) );
 
 	// #112 create a global for the SERVER_NAME
@@ -36,11 +37,25 @@ function KISSCMS() {
 	}
 
 	if (!$server_settings_found) {
-		$errmsg = sprintf("Missing environment section for server name '%s'.", $_SERVER['SERVER_NAME']);
+		$errmsg[] = sprintf("Missing environment section for server name '%s'.", $_SERVER['SERVER_NAME']);
+		$error_flagged = true;
 	}
 
-	if($errmsg){
-		die("Environment variables not setup properly. Open " . $env_file_path . " and edit as needed... " . $errmsg);
+	// augment error report to help user identify the issue at hand...
+	if (file_exists($env_file_path)) {
+		$errmsg[] = "We have found your configuration in `" . $env_file_path . "` (path = `" . realpath($env_file_path) . "`)";
+	}
+	if (defined("APP")){ 
+		$errmsg[] = "APP is defined as `" . APP . "` and we expected to find the init code here: `" . APP.'bin/init.php' . "`";
+	} elseif (defined("BASE")) {
+		$errmsg[] = "APP is not defined hence we require BASE to be defined at least";
+		$errmsg[] = "BASE is defined as `" . BASE . "` and we expected to find the init code here: `" . BASE.'bin/init.php' . "`";
+	} else {
+		$errmsg[] = "Neither APP nor BASE are defined and we need at least one of these to locate the init code (`init.php`)";
+	}
+
+	if($error_flagged){
+		die("Environment variables not setup properly. Open " . $env_file_path . " and edit as needed...\n<br/>\n<br/>" . implode("\n<br/>", $errmsg));
 	} elseif (defined("APP") && is_file(APP.'bin/init.php')){ 
 		// find the clone file first
 		require_once(APP.'bin/init.php');
@@ -48,20 +63,7 @@ function KISSCMS() {
 		// find the core file second
 		require_once(BASE.'bin/init.php');
 	} else {
-		$errmsg = [];
-
-		if (file_exists($env_file_path)) {
-			$errmsg[] = "We have found your configuration in `" . $env_file_path . "` (path = `" . realpath($env_file_path) . "`)";
-		}
-		if (defined("APP")){ 
-			$errmsg[] = "APP is defined as `" . APP . "` and we expected to find the init code here: `" . APP.'bin/init.php' . "`";
-		} elseif (defined("BASE")) {
-			$errmsg[] = "APP is not defined hence we require BASE to be defined at least";
-			$errmsg[] = "BASE is defined as `" . BASE . "` and we expected to find the init code here: `" . BASE.'bin/init.php' . "`";
-		} else {
-			$errmsg[] = "Neither APP nor BASE are defined and we need at least one of these to locate the init code (`init.php`)";
-		}
-		die("KISSCMS is not installed. Visit kisscms.com for instructions.\n\n" . implode("\n", $errmsg));
+		die("KISSCMS is not installed. Visit kisscms.com for instructions.\n<br/>\n<br/>" . implode("\n<br/>", $errmsg));
 	}
 }
 
