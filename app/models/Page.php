@@ -14,7 +14,7 @@ class Page extends Model {
 			$this->rs['tags']= '';
 			$this->rs['template']= '';
 		// initiate parent constructor
-		parent::__construct('pages.sqlite',  $this->pkname, $this->tablename); //primary key = id; tablename = pages
+		parent::__construct(DB_PAGES,  $this->pkname, $this->tablename); //primary key = id; tablename = pages
 			// retrieve the specific page (if available)
 			if ($id){
 				$this->retrieve($id);

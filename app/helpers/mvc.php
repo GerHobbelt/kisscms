@@ -7,7 +7,7 @@ class Model extends KISS_Model  {
 
 	public $db;
 
-	function __construct($db='pages.sqlite', $pkname='',$tablename='',$dbhfnname='getdbh',$quote_style='MYSQL',$compress_array=true) {
+	function __construct($db=DB_PAGES, $pkname='',$tablename='',$dbhfnname='getdbh',$quote_style='MYSQL',$compress_array=true) {
 		$this->db=$db; //Name of the database
 		$this->pkname=$pkname; //Name of auto-incremented Primary Key
 		$this->tablename=$tablename; //Corresponding table in database
