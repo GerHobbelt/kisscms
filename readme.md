@@ -31,7 +31,7 @@ KISSCMS can be installed by using Composer (getcomposer.org) or just by download
 4. Go to ```./admin``` in your browser to enter the administration area. The default (username/password) are: ** admin / admin **
 
 Notes:
-1. The `env.json` file which defines your website setup is **ignored** by git, hence you can run a demo/test website straight off the `git clone` repository without polluting the kissCMS repository itself, when you are a bit careful. :-)
+1. The `env.local.json` file overrides the git-tracked `env.json` file and is **ignored by git**, hence you can run a demo/test website straight off the `git clone` repository without polluting the kissCMS repository itself, when you are a bit careful by copying `env.json` to `env.local.json` and entering your local site settings in this new file. :-)
 
 
 ## Customization

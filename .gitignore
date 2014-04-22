@@ -7,5 +7,5 @@ tmp
 *.bak
 
 # Run a demo (test) site inside the repo without polluting it
-env.json
+env.local.json
 public/cookie.txt

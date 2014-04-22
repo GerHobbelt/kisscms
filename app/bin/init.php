@@ -5,7 +5,7 @@
 //===============================================
 
 // first check where the folders are located ( based on the location of env.json)
-define("SITE_ROOT", (file_exists("../env.json")) ? realpath("../") : realpath("./") );
+define("SITE_ROOT", file_exists("../env.local.json") ? realpath("../") : file_exists("env.local.json") ? realpath("./") : file_exists("../env.json") ? realpath("../") : realpath("./") );
 
 // where the app is located
 if(!defined("APP")) define('APP', SITE_ROOT.'/app/'); //with trailing slash pls

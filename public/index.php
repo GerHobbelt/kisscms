@@ -15,7 +15,8 @@ Dual-licensed under the MIT/X11 license and the GNU General Public License (GPL)
 function KISSCMS() {
 	$errmsg = false;
 	$server_settings_found = false;
-	$ENV = json_decode( file_get_contents( ( file_exists("../env.json") ) ? "../env.json": "env.json" ) );
+	$env_file_path = ( file_exists("../env.local.json") ? "../env.local.json" : file_exists("env.local.json") ? "env.local.json" : file_exists("../env.json") ? "../env.json" : "env.json" );
+	$ENV = json_decode( file_get_contents( $env_file_path ) );
 
 	// #112 create a global for the SERVER_NAME
 	$GLOBALS['SERVER_NAME'] = ( strpos($_SERVER['SERVER_NAME'], "localhost") !== false || strpos($_SERVER['SERVER_NAME'], $_SERVER['SERVER_ADDR']) !== false ) ? "localhost" : $_SERVER['SERVER_NAME'];
@@ -39,7 +40,7 @@ function KISSCMS() {
 	}
 
 	if($errmsg){
-		die("Environment variables not setup properly. Open env.json and edit as needed... " . $errmsg);
+		die("Environment variables not setup properly. Open " . $env_file_path . " and edit as needed... " . $errmsg);
 	} elseif (defined("APP") && is_file(APP.'bin/init.php')){ 
 		// find the clone file first
 		require_once(APP.'bin/init.php');
@@ -47,7 +48,20 @@ function KISSCMS() {
 		// find the core file second
 		require_once(BASE.'bin/init.php');
 	} else {
-		die("KISSCMS is not installed. Visit kisscms.com for instructions." . $errmsg);
+		$errmsg = [];
+
+		if (file_exists($env_file_path)) {
+			$errmsg[] = "We have found your configuration in `" . $env_file_path . "` (path = `" . realpath($env_file_path) . "`)";
+		}
+		if (defined("APP")){ 
+			$errmsg[] = "APP is defined as `" . APP . "` and we expected to find the init code here: `" . APP.'bin/init.php' . "`";
+		} elseif (defined("BASE")) {
+			$errmsg[] = "APP is not defined hence we require BASE to be defined at least";
+			$errmsg[] = "BASE is defined as `" . BASE . "` and we expected to find the init code here: `" . BASE.'bin/init.php' . "`";
+		} else {
+			$errmsg[] = "Neither APP nor BASE are defined and we need at least one of these to locate the init code (`init.php`)";
+		}
+		die("KISSCMS is not installed. Visit kisscms.com for instructions.\n\n" . implode("\n", $errmsg));
 	}
 }
 
