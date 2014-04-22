@@ -1,8 +1,11 @@
 .DS_Store
-env.json
 app/plugins
 tmp
-public/cookie.txt
+
 # Editor backup files
 *~
 *.bak
+
+# Run a demo (test) site inside the repo without polluting it
+env.json
+public/cookie.txt
