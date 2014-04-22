@@ -86,5 +86,3 @@ class Session extends REST_Service {
 }
 
 }
-
-?>

@@ -345,5 +345,3 @@ class Template extends KISS_View {
 	}
 
 }
-
-?>

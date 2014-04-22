@@ -123,4 +123,3 @@ class Page extends Model {
 	}
 
 }
-?>

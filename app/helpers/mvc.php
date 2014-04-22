@@ -494,5 +494,3 @@ class View extends KISS_View {
 	}
 
 }
-
-?>

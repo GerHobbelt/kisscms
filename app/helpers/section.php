@@ -369,5 +369,3 @@ class Body extends Section {
 		}
 	}
 }
-
-?>

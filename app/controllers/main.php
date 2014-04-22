@@ -8,6 +8,3 @@ class Main extends Page_Controller {
 	}
 
 }
-
-
-?>

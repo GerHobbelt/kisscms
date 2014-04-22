@@ -11,5 +11,3 @@ if( class_exists('Page') && method_exists(new Page(),'register')){
 	Page::register("1", "path", "");
 	Page::register("1", "template", $GLOBALS['config']['main']['default_template']);
 }
-
-?>

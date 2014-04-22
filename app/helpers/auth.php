@@ -141,5 +141,3 @@ class KISS_Auth extends Controller {
 
 }
 }
-
-?>

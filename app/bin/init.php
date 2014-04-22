@@ -407,5 +407,3 @@ set_exception_handler("uncaught_exception_handler");
 //===============================================s
 
 $output = new $controller( 'controllers/', WEB_FOLDER, DEFAULT_ROUTE, DEFAULT_ACTION);
-
-?>

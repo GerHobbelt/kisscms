@@ -699,5 +699,3 @@ class Minify extends UglifyJS {
 	}
 
 }
-
-?>

@@ -287,5 +287,3 @@ class REST_Service extends Controller {
 }
 
 }
-
-?>

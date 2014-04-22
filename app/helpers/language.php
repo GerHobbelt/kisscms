@@ -13,5 +13,3 @@ $GLOBALS['language']['delete_confirm']="Are you sure you want to delete the page
 $GLOBALS['language']['config']['sitename']="Website Title";
 $GLOBALS['language']['config']['username']="Username";
 $GLOBALS['language']['config']['password']="Password";
-
-?>

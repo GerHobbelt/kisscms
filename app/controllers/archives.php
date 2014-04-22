@@ -32,7 +32,6 @@ class Archives extends Controller {
 	}
 
 	function requestAllPages() {
-
 		$page=new Page();
 		$page->tablename = "pages";
 		$pages = $page->retrieve_many("date LIKE '%".$this->data['date']."%'");
@@ -42,11 +41,5 @@ class Archives extends Controller {
 			$data['view'] = $view;
 			$this->data['body'][] = $data;
 		}
-
 	}
-
-
 }
-
-
-?>

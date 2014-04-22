@@ -73,6 +73,3 @@ function KISSCMS() {
 
 
 KISSCMS();
-
-
-?>

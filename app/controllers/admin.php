@@ -221,4 +221,3 @@ class Admin extends Controller {
 		@file_put_contents(APP.'public/humans.txt', $output);
 	}
 }
-?>

@@ -105,9 +105,4 @@ class Page_Controller extends KISS_Auth {
 		}
 
 	}
-
-
 }
-
-
-?>
