@@ -23,26 +23,26 @@ class Admin extends Controller {
 		$db_password = $GLOBALS['config']['admin']['admin_password'];
 		$db_username = $GLOBALS['config']['admin']['admin_username'];
 		// check user input
-		if( isset($_POST['admin_username']) && $_POST['admin_password']){
-			$username=trim($_POST['admin_username']);
-			$password=crypt($_POST['admin_password'], $db_password);
+		if (isset($_POST['admin_username']) && $_POST['admin_password']) {
+			$username = trim($_POST['admin_username']);
+			$password = crypt($_POST['admin_password'], $db_password);
 			// check for the entered data
 			// #25 - leaving legacy password check for backwards compatibility (to be deprecated)
-			if( $username == $db_username && ( $password == $db_password || $_POST['admin_password'] == $db_password ) ){
+			if ($username == $db_username && ($password == $db_password || $_POST['admin_password'] == $db_password)) {
 				$login = true;
 			}
 		}
 
-		if($login == true) {
+		if ($login == true) {
 			$_SESSION['admin'] = "true";
 			header('Location: '.url());
 			exit();
 		} else {
 			// display login form
-			//$this->data['body']['admin']= View::do_fetch( getPath('views/admin/login.php'), $this->data);
+			//$this->data['body']['admin'] = View::do_fetch(getPath('views/admin/login.php'), $this->data);
 			$data['view'] = getPath('views/admin/login.php');
 			$this->data['body'][] = $data;
-			$this->data['template']= ADMIN_TEMPLATE;
+			$this->data['template'] = ADMIN_TEMPLATE;
 
 			// display the page
 			Template::output($this->data);
@@ -57,26 +57,26 @@ class Admin extends Controller {
 	}
 
 
-	function config( $params=array() ) {
+	function config($params = array()) {
 		// if saving...
-		if( $_SERVER['REQUEST_METHOD'] == "POST" ){
+		if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 		// loop through all the other data and reorganise them properly
-		foreach($params as $k=>$v){
+		foreach ($params as $k=>$v) {
 			// exit if the values is empty (but not false)?
-			if( empty($v) && $v != "0" ) continue;
+			if (empty($v) && $v != "0") continue;
 			// get the controller from the field name
 			$name = explode("|", $k);
-			if(count($name) < 2) continue;
+			if (count($name) < 2) continue;
 			$table = $name[0];
 			$key = $name[1];
 			//#25 - encrupting 'password' fields
-			$value = ( $key== "admin_password" ) ? crypt( $v ) : $v;
+			$value = ($key== "admin_password") ? crypt($v) : $v;
 			// only save the data that has changed
-			if( $GLOBALS["config"][$table][$key] != $value ){
+			if ($GLOBALS["config"][$table][$key] != $value) {
 				$config = new Config(0, $table);
 				// find the entry with the right key
-				$config->retrieve_one("key=?", $key);
+				$config->retrieve_one("key = ?", $key);
 				//$config->pkname = 'key';
 				$config->set('key', $key);
 				$config->set('value', $value);
@@ -94,11 +94,11 @@ class Admin extends Controller {
 
 		} else {
 			// show the configuration
-			//$this->data['body']['admin']=View::do_fetch( getPath('views/admin/config.php'),$this->data);
-			$data['view']= getPath('views/admin/config.php');
-			$this->data['status']= "config";
+			//$this->data['body']['admin'] = View::do_fetch(getPath('views/admin/config.php'), $this->data);
+			$data['view'] = getPath('views/admin/config.php');
+			$this->data['status'] = "config";
 			$this->data['body'][] = $data;
-			$this->data['template']= ADMIN_TEMPLATE;
+			$this->data['template'] = ADMIN_TEMPLATE;
 
 			// display the page
 			Template::output($this->data);
@@ -108,34 +108,34 @@ class Admin extends Controller {
 	/*
 	*  CMS Actions
 	*/
-	function create($params=false) {
+	function create($params = false) {
 
-		$data['status']= $this->data['status']="create";
-		$data['path']= ( is_array($params) && array_key_exists("path", $params) ) ? $params["path"] : clean($_REQUEST['path']);
-		$data['tags']= "";
-		$data['view']= getPath('views/admin/edit_page.php');
-		$data['template']= DEFAULT_TEMPLATE;
-		//$this->data['admin']=isset($_SESSION['admin']) ? $_SESSION['admin'] : 0;
+		$data['status'] = $this->data['status'] = "create";
+		$data['path'] = (is_array($params) && array_key_exists("path", $params)) ? $params["path"] : clean($_REQUEST['path']);
+		$data['tags'] = "";
+		$data['view'] = getPath('views/admin/edit_page.php');
+		$data['template'] = DEFAULT_TEMPLATE;
+		//$this->data['admin'] = isset($_SESSION['admin']) ? $_SESSION['admin'] : 0;
 
-		//$this->data['body']['admin']= View::do_fetch( getPath('views/admin/edit_page.php'), $this->data);
+		//$this->data['body']['admin'] = View::do_fetch(getPath('views/admin/edit_page.php'), $this->data);
 		$this->data['body'][] = $data;
-		$this->data['template']= ADMIN_TEMPLATE;
+		$this->data['template'] = ADMIN_TEMPLATE;
 
 		// display the page
 		Template::output($this->data);
 	}
 
-	function edit($id=null) {
+	function edit($id = null) {
 
-		$page=new Page($id);
+		$page = new Page($id);
 
 		// see if we have found a page
-		if( $page->get('id') ){
+		if ($page->get('id')) {
 			$data = $page->getAll();
 			// clean up this old logic...
 			$data['id'] = $this->data['id'] = $page->get('id');
-			//$data['title'] = stripslashes( $page->get('title') );
-			//$data['content'] = stripslashes( $page->get('content') );
+			//$data['title'] = stripslashes($page->get('title'));
+			//$data['content'] = stripslashes($page->get('content'));
 			$data['path'] = $this->data['path'] = $page->get('path');
 			$data['tags'] = $page->get('tags');
 			$data['view'] = getPath('views/admin/edit_page.php');
@@ -143,26 +143,26 @@ class Admin extends Controller {
 			// presentation variables
 			$data['template'] = $page->get('template');
 		} else {
-			$data['status']= $this->data['status']="error";
+			$data['status'] = $this->data['status'] = "error";
 			$data['view'] = getPath('views/admin/error.php');
 		}
 
 		// Now render the output
 		$this->data['body'][] = $data;
-		$this->data['template']= ADMIN_TEMPLATE;
+		$this->data['template'] = ADMIN_TEMPLATE;
 
 		// display the page
 		Template::output($this->data);
 	}
 
-	function update( $params=array() ) {
+	function update($params = array()) {
 
 		$validate = $this->validate();
 		// see if we have found a page
-		if( $validate == true ){
+		if ($validate == true) {
 			$this->save($params);
 		}
-		// shouldn't we use    $this->$data['path']    or    ( is_array($params) && array_key_exists("path", $params) ) ? $params["path"] : clean($_REQUEST['path'])    here?;
+		// shouldn't we use    $this->$data['path']    or    (is_array($params) && array_key_exists("path", $params)) ? $params["path"] : clean($_REQUEST['path'])    here?;
 		header('Location: '.url(clean($_REQUEST['path'])));
 
 	}
@@ -172,16 +172,16 @@ class Admin extends Controller {
 		return true;
 	}
 
-	function save( $params=array() ) {
+	function save($params = array()) {
 
 		// define/filter the data set
 		$fields = array("id", "title", "content", "tags", "template");
 		$data = array_fill_keys($fields, "");
 		$data = array_merge($data, $params);
 
-		if( array_key_exists("id", $params) ){
+		if (array_key_exists("id", $params)) {
 			// Update existing page
-			$page=new Page($data['id']);
+			$page = new Page($data['id']);
 			$page->set('title', 	$data['title']);
 			$page->set('content', 	$data['content']);
 			$page->set('tags', 		$data['tags']);
@@ -189,7 +189,7 @@ class Admin extends Controller {
 			$page->update();
 		} else {
 			// Create new page
-			$page=new Page();
+			$page = new Page();
 			$page->set('title', 	$data['title']);
 			$page->set('content', 	$data['content']);
 			$page->set('tags', 		$data['tags']);
@@ -200,23 +200,22 @@ class Admin extends Controller {
 
 		// Generate sitemap
 		$sitemap = new Sitemap();
-
 	}
 
-	function delete($id=null) {
+	function delete($id = null) {
 
-		if( $id ){
-			$page=new Page($id);
+		if ($id) {
+			$page = new Page($id);
 			$page->delete();
 		}
 		header('Location: '.url());
 	}
 
-	function humansText(){
+	function humansText() {
 		//get config
 		$data['config'] = $GLOBALS['config'];
-		// load tempalate
-		$output = View::do_fetch( getPath("views/admin/humans.php"), $data);
+		// load template
+		$output = View::do_fetch(getPath("views/admin/humans.php"), $data);
 		// write file
 		@file_put_contents(APP.'public/humans.txt', $output);
 	}
