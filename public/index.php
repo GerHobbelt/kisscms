@@ -21,7 +21,7 @@ function KISSCMS() {
 	// #112 create a global for the SERVER_NAME
 	$GLOBALS['SERVER_NAME'] = ( strpos($_SERVER['SERVER_NAME'], "localhost") !== false || strpos($_SERVER['SERVER_NAME'], $_SERVER['SERVER_ADDR']) !== false ) ? "localhost" : $_SERVER['SERVER_NAME'];
 
-	// Process enviromental variables (from env.json)
+	// Process environment variables (from env.json)
 	foreach( $ENV as $domain => $properties ){ 
 		// check the domain against each set
 		if( strpos($GLOBALS['SERVER_NAME'], $domain) !== false ){ 
