@@ -32,7 +32,6 @@ if( class_exists('Config') && method_exists(new Config(),'register')){
 	define("ADMIN_TEMPLATE", "admin.php");
 	define("LISTINGS_TEMPLATE", "listings.php");
 
-
 	define('DB_PAGES', $GLOBALS['config']['main']['db_pages']);
 }
 
@@ -41,6 +40,6 @@ if( class_exists('Config') && method_exists(new Config(),'register')){
 //===============================================
 ini_set('session.gc_maxlifetime',300);
 ini_set('display_errors','On');
-error_reporting(E_ALL);
+error_reporting(E_ALL | E_STRICT);
 
 ?>
