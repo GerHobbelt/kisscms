@@ -16,6 +16,8 @@ if( class_exists('Config') && method_exists(new Config(),'register')){
 	Config::register("main", "default_action", "index");
 
 	Config::register("main", "default_template", "default.php");
+	Config::register("main", "admin_template", "admin.php");
+	Config::register("main", "listings_template", "listings.php");
 
 	Config::register("main", "db_pages", "pages.sqlite");
 
@@ -23,16 +25,6 @@ if( class_exists('Config') && method_exists(new Config(),'register')){
 	Config::register("admin", "admin_password", '$1$VGthOaJJ$o7GR6b657c7mtrOCTLZgO.');
 
 	Config::register("admin", "uglify_service", "http://uglify.makesit.es/");
-
-	// Definitions
-	define('DEFAULT_ROUTE', $GLOBALS['config']['main']['default_route']);
-	define('DEFAULT_ACTION', $GLOBALS['config']['main']['default_action']);
-
-	define('DEFAULT_TEMPLATE', $GLOBALS['config']['main']['default_template']);
-	define("ADMIN_TEMPLATE", "admin.php");
-	define("LISTINGS_TEMPLATE", "listings.php");
-
-	define('DB_PAGES', $GLOBALS['config']['main']['db_pages']);
 }
 
 //===============================================

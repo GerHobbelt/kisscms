@@ -17,7 +17,12 @@ class Config extends Model {
 		if(!array_key_exists('config', $GLOBALS)) $GLOBALS['config'] = array();
 		// exit now if variable already available
 		$key_exists = ( array_key_exists($table, $GLOBALS['config']) && array_key_exists($key, $GLOBALS['config'][$table]) && !(empty($GLOBALS['config'][$table][$key]) && is_null($GLOBALS['config'][$table][$key])) );
-		if ( $key_exists ) return;
+		if ( $key_exists ) {
+			if ($table === "main" && !defined(strtoupper($key))) {
+				define(strtoupper($key), $value);
+			}
+			return;
+		}
 
 		// then check if the table exists
 		if( empty($GLOBALS['config'][$table]) ){
@@ -36,6 +41,9 @@ class Config extends Model {
 		// save in the global object
 		$GLOBALS['config'][$table][$key] = $value;
 
+		if ($table === "main" && !defined(strtoupper($key))) {
+			define(strtoupper($key), $value);
+		}
 	}
 
 	// loading config - removing duplicate entries
@@ -61,6 +69,10 @@ class Config extends Model {
 					}
 				} else {
 					$config[$table][$row['key']] = $row['value'];
+
+					if ($table === "main" && !defined(strtoupper($row['key']))) {
+						define(strtoupper($row['key']), $row['value']);
+					}
 				}
 			}
 		}
