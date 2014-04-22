@@ -5,7 +5,7 @@ class Config extends Model {
 		$this->id = $id;
 		$this->pkname = 'id';
 		$this->tablename = $table;
-		parent::__construct('config.sqlite', $this->pkname, $this->tablename); //primary key = id; tablename = sqlite_master
+		parent::__construct(DB_CONFIG, $this->pkname, $this->tablename); //primary key = id; tablename = sqlite_master
 		$this->rs['id'] = $id;
 		$this->rs['key'] = '';
 		$this->rs['value'] = '';

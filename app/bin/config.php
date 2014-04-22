@@ -20,6 +20,7 @@ if( class_exists('Config') && method_exists(new Config(),'register')){
 	Config::register("main", "listings_template", "listings.php");
 
 	Config::register("main", "db_pages", "pages.sqlite");
+	Config::register("main", "db_config", "config.local.sqlite");
 
 	Config::register("admin", "admin_username", "admin");
 	Config::register("admin", "admin_password", '$1$VGthOaJJ$o7GR6b657c7mtrOCTLZgO.');
