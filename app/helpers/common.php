@@ -118,9 +118,10 @@ function isStatic( $file ) {
 }
 
 function getFile($filename) {
-	$exts = explode(".", strtolower($filename) ) ;
-	$ext = array_pop( $exts );
+	$exts = explode(".", strtolower($filename));
+	$ext = array_pop($exts);
 	switch ($ext) {
+		case "php": return "We don't dump PHP files in the clear!";
 		case "txt": $ctype="text/plain"; break;
 		case "css": $ctype="text/css"; break;
 		case "js": $ctype="application/javascript"; break;
@@ -191,10 +192,9 @@ function getPath( $file ) {
 function url($file='', $cdn=false){
 	// get the full uri for the file
 	$uri = uri($file);
-	$static_uri = isStatic( $uri );
 
 	// check if it is a static
-	if( $cdn && defined("CDN") && $static_uri){
+	if( $cdn && defined("CDN") && isStatic( $uri )){
 		// load the cdn address instead
 		// remove trailing slash, if any
 		$domain = ( substr(CDN, -1) == "/" ) ? substr(CDN, 0, -1) : CDN;
@@ -211,7 +211,7 @@ function url($file='', $cdn=false){
 	}
 
 	// add the uri
-	$url = $domain . ($static_uri === false ? $uri : $static_uri);
+	$url = $domain . $uri;
 
 	return $url;
 }
@@ -693,5 +693,3 @@ function getjAlert() {
   return '';
 }
 */
-
-?>
