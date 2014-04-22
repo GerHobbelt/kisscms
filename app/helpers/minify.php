@@ -380,7 +380,7 @@ class Minify extends UglifyJS {
 
 	//
 
-	function write() {
+	function write( $output=false ) {
 
 		foreach($this->_srcs as $name=>$cache_file){
 
