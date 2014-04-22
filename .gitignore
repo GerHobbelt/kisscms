@@ -9,3 +9,4 @@ tmp
 # Run a demo (test) site inside the repo without polluting it
 env.local.json
 public/cookie.txt
+data/*.sqlite
