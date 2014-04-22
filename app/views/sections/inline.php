@@ -1,10 +1,10 @@
-<section <?=attr("id", $vars['id'])?> <?=attr("class", $vars['class'])?>>
-<? if(!empty($vars['h3'])){ ?>
-<strong <?=attr("id", $vars['h3-id'])?> <?=attr("class", $vars['h3-class'])?>><?=$vars['h3']?></strong>
-<? } ?>
-<? 
+<section <?php echo attr("id", $vars['id']); ?> <?php echo attr("class", $vars['class']); ?>>
+<?php if(!empty($vars['h3'])){ ?>
+<strong <?php echo attr("id", $vars['h3-id']); ?> <?php echo attr("class", $vars['h3-class']); ?>><?php echo $vars['h3']; ?></strong>
+<?php } ?>
+<?php 
 foreach($items as $item){ ?>
-	<a href="<?=$item['url']?>" rel="tag"><?=$item['title']?></a>
-<? if ( $vars['delimiter'] && $item != end($items) ){ echo $vars['delimiter'].' '; } ?>
-<? } ?>
+	<a href="<?php echo $item['url']; ?>" rel="tag"><?php echo $item['title']; ?></a>
+<?php if ( $vars['delimiter'] && $item != end($items) ){ echo $vars['delimiter'].' '; } ?>
+<?php } ?>
 </section>

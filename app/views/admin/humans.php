@@ -3,8 +3,8 @@
 
 
 /* TEAM */
-  Author: <?=$config['main']['site_author']?>
-  Site: <?=url('', true)?>
+  Author: <?php echo $config['main']['site_author']; ?>
+  Site: <?php echo url('', true); ?>
   
 /* THANKS */
   Makis Tracend (http://makesit.es)

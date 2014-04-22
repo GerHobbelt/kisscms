@@ -1,8 +1,8 @@
 #AddHandler php5latest-script .php
 AddHandler php5-script .php
 
-# Allow <?...?> 'short tags' next to the usual <?php...?>
-php_value short_open_tag 1
+# Uncomment the next line when you want to allow <?...?> 'short tags' next to the usual <?php...?>
+#php_value short_open_tag 1
 
 # Webfonts
 AddType application/vnd.ms-fontobject .eot

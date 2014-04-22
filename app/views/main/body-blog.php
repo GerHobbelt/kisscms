@@ -1,8 +1,8 @@
 <div class="post">
 	<div class="posttop">
-		<a href="<? url( $path ) ?>" rel="bookmark" title="Permanent Link: <?=$title?>">
+		<a href="<?php url($path); ?>" rel="bookmark" title="Permanent Link: <?php echo $title; ?>">
 			<label>
-				<strong class="date"><?=date("d", strtotime($date))?></strong> <strong class="month"><?=date("M", strtotime($date))?></strong>
+				<strong class="date"><?php echo date("d", strtotime($date)); ?></strong> <strong class="month"><?php echo date("M", strtotime($date)); ?></strong>
 				<!--strong class="comments">0</strong-->
 			</label>
 		</a>
@@ -10,15 +10,15 @@
 
 	<!-- end of .posttop -->
 	<div class="postbody">
-		<h2><?=$title?></h2>
+		<h2><?php echo $title; ?></h2>
 		<p class="postinfo">
-			Posted at <?=date("G:i", strtotime($date))?>
+			Posted at <?php echo date("G:i", strtotime($date)); ?>
 		</p>
-		<div><?=$content?></div>
+		<div><?php echo $content; ?></div>
 	</div>
 	<!-- end of .postfoot -->
 	<div class="postmeta">
-		<? Tags::inline("class: right, delimiter: ',', h3: 'Tags:'", $tags)?>
+		<?php Tags::inline("class: right, delimiter: ',', h3: 'Tags:'", $tags); ?>
 	</div>
 	<!-- end of .postmeta -->
 </div>

@@ -8,5 +8,6 @@ header("HTTP/1.0 500 Internal Server Error: Uncaught Exception");
 </head>
 <body>
 <h1>500 Internal Server Error: Uncaught Exception</h1>
-<p><?=isset($message) ? "<pre>$message</pre>":'Unknown uncaught exception occured.';?></p>
-</body></html>
+<p><?php echo isset($message) ? "<pre>$message</pre>" : "Unknown uncaught exception occured."; ?></p>
+</body>
+</html>

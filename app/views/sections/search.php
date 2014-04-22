@@ -6,7 +6,7 @@
 
 <script type="text/javascript">
 
-var domainroot='<?=url()?>';
+var domainroot='<?php echo url(); ?>';
 
 function Gsitesearch(curobj){
 	curobj.q.value='site:'+domainroot+' '+curobj.qfront.value;

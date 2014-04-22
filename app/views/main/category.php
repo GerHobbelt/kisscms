@@ -1,9 +1,9 @@
 <hr />
-<h2><a href="<?=url($path)?>"><?=$title?></a></h2>
+<h2><a href="<?php echo url($path); ?>"><?php echo $title; ?></a></h2>
 
-<? $_summary = ""; $_summary = truncate(strip_tags($content), 100, " ", "..."); ?>
-<? if( !empty($_summary) ){ ?>
+<?php $_summary = ""; $_summary = truncate(strip_tags($content), 100, " ", "..."); ?>
+<?php if( !empty($_summary) ){ ?>
 <div>
-<?=$_summary ?>
+<?php echo $_summary; ?>
 </div>
-<? } ?>
+<?php } ?>

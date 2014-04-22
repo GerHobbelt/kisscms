@@ -4,7 +4,7 @@
 
 <p>Would you like to create it now?</p>
 
-<form action="<?=url("admin/create")?>" method="POST">
-<input type="hidden" name="path" value="<?=$path?>">
+<form action="<?php echo url("admin/create"); ?>" method="POST">
+<input type="hidden" name="path" value="<?php echo $path; ?>">
 <input type="submit" value="Create" />
 </form>

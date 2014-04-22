@@ -1,5 +1,7 @@
-<? if(!empty($title)){ ?><h2><?=$title?></h2><? } ?>
+<?php if(!empty($title)){ ?>
+<h2><?php echo $title; ?></h2>
+<?php } ?>
 
 <div class="content">
-<?=$content?>
+<?php echo $content; ?>
 </div>
