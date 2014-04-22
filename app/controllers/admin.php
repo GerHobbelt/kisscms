@@ -34,13 +34,13 @@ class Admin extends Controller {
 		}
 
 		if($login == true) {
-			$_SESSION['admin']="true";
+			$_SESSION['admin'] = "true";
 			header('Location: '.url());
 			exit();
 		} else {
 			// display login form
 			//$this->data['body']['admin']= View::do_fetch( getPath('views/admin/login.php'), $this->data);
-			$data['view']= getPath('views/admin/login.php');
+			$data['view'] = getPath('views/admin/login.php');
 			$this->data['body'][] = $data;
 			$this->data['template']= ADMIN_TEMPLATE;
 
@@ -162,7 +162,8 @@ class Admin extends Controller {
 		if( $validate == true ){
 			$this->save($params);
 		}
-		header('Location: '.url($_REQUEST['path']));
+		// shouldn't we use    $this->$data['path']    or    ( is_array($params) && array_key_exists("path", $params) ) ? $params["path"] : clean($_REQUEST['path'])    here?;
+		header('Location: '.url(clean($_REQUEST['path'])));
 
 	}
 
