@@ -5,6 +5,10 @@
 <p>Would you like to create it now?</p>
 
 <form action="<?php echo url("admin/create"); ?>" method="POST">
-<input type="hidden" name="path" value="<?php echo $path; ?>">
-<input type="submit" value="Create" />
+
+    <label for="path">Page URL</label>
+    <input type="text" name="path" value="<?php echo $path; ?>" />
+    <p>Actual URL: <span id="actual_page_path_url"><?php echo url($path); ?></span></p>
+
+    <input type="submit" value="Create" />
 </form>

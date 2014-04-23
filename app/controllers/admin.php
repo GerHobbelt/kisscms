@@ -60,38 +60,35 @@ class Admin extends Controller {
 	function config($params = array()) {
 		// if saving...
 		if ($_SERVER['REQUEST_METHOD'] == "POST") {
-
-		// loop through all the other data and reorganise them properly
-		foreach ($params as $k=>$v) {
-			// exit if the values is empty (but not false)?
-			if (empty($v) && $v != "0") continue;
-			// get the controller from the field name
-			$name = explode("|", $k);
-			if (count($name) < 2) continue;
-			$table = $name[0];
-			$key = $name[1];
-			//#25 - encrupting 'password' fields
-			$value = ($key== "admin_password") ? crypt($v) : $v;
-			// only save the data that has changed
-			if ($GLOBALS["config"][$table][$key] != $value) {
-				$config = new Config(0, $table);
-				// find the entry with the right key
-				$config->retrieve_one("key = ?", $key);
-				//$config->pkname = 'key';
-				$config->set('key', $key);
-				$config->set('value', $value);
-				$config->update();
-				// update memory
-				$GLOBALS["config"][$table][$key] = $value;
+			// loop through all the other data and reorganise them properly
+			foreach ($params as $k=>$v) {
+				// exit if the values is empty (but not false)?
+				if (empty($v) && $v != "0") continue;
+				// get the controller from the field name
+				$name = explode("|", $k);
+				if (count($name) < 2) continue;
+				$table = $name[0];
+				$key = $name[1];
+				//#25 - encrupting 'password' fields
+				$value = ($key == "admin_password") ? crypt($v) : $v;
+				// only save the data that has changed
+				if ($GLOBALS["config"][$table][$key] != $value) {
+					$config = new Config(0, $table);
+					// find the entry with the right key
+					$config->retrieve_one("key = ?", $key);
+					//$config->pkname = 'key';
+					$config->set('key', $key);
+					$config->set('value', $value);
+					$config->update();
+					// update memory
+					$GLOBALS["config"][$table][$key] = $value;
+				}
 			}
+			// generate the humans.txt file
+			$humans = $this->humansText();
 
-		}
-		// generate the humans.txt file
-		$humans = $this->humansText();
-
-		// redirect back to the configuration page
-		header('Location: '.url('admin/config'));
-
+			// redirect back to the configuration page
+			header('Location: '.url('admin/config'));
 		} else {
 			// show the configuration
 			//$this->data['body']['admin'] = View::do_fetch(getPath('views/admin/config.php'), $this->data);
@@ -109,9 +106,8 @@ class Admin extends Controller {
 	*  CMS Actions
 	*/
 	function create($params = false) {
-
 		$data['status'] = $this->data['status'] = "create";
-		$data['path'] = (is_array($params) && array_key_exists("path", $params)) ? $params["path"] : clean($_REQUEST['path']);
+		$data['path'] = (is_array($params) && array_key_exists("path", $params)) ? $params["path"] : clean(!empty($_REQUEST['path']) ? $_REQUEST['path'] : "");
 		$data['tags'] = "";
 		$data['view'] = getPath('views/admin/edit_page.php');
 		$data['template'] = DEFAULT_TEMPLATE;
@@ -126,7 +122,6 @@ class Admin extends Controller {
 	}
 
 	function edit($id = null) {
-
 		$page = new Page($id);
 
 		// see if we have found a page
@@ -156,26 +151,23 @@ class Admin extends Controller {
 	}
 
 	function update($params = array()) {
-
-		$validate = $this->validate();
+		$validate = $this->validate($params);
 		// see if we have found a page
-		if ($validate == true) {
+		if ($validate === true) {
 			$this->save($params);
 		}
-		// shouldn't we use    $this->$data['path']    or    (is_array($params) && array_key_exists("path", $params)) ? $params["path"] : clean($_REQUEST['path'])    here?;
-		header('Location: '.url(clean($_REQUEST['path'])));
-
+		// and point us to the (possibly updated) path:
+		header('Location: ' . url($params['path']));
 	}
 
-	function validate() {
+	function validate($params) {
 		// insert proper validation HERE
 		return true;
 	}
 
 	function save($params = array()) {
-
 		// define/filter the data set
-		$fields = array("id", "title", "content", "tags", "template");
+		$fields = array("id", "title", "content", "tags", "template", "path");
 		$data = array_fill_keys($fields, "");
 		$data = array_merge($data, $params);
 
@@ -186,6 +178,8 @@ class Admin extends Controller {
 			$page->set('content', 	$data['content']);
 			$page->set('tags', 		$data['tags']);
 			$page->set('template', 	$data['template']);
+			// the PATH may be changed by an edit!
+			$page->set('path', 		$data['path']);
 			$page->update();
 		} else {
 			// Create new page

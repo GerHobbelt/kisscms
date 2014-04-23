@@ -2,6 +2,7 @@
 	<h3><a href="http://kisscms.com/" title="Made with love...">KISSCMS</a></h3>
 	<ul>
 <?php if ((isset($id) && !isset($status)) || (isset($id) && isset($status) && $status !== "edit")) { ?>
+        <li><a href="<?php echo url("admin/create/"); ?>">Create another page</a></li>
 		<li><a href="<?php echo url("admin/edit/$id"); ?>">Edit page</a></li>
 <?php } elseif(isset($path) && isset($status) && $status == "new") { ?>
 		<li><a href="<?php echo url("admin/create/".$path); ?>">Create page</a></li>

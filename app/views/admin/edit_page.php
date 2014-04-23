@@ -23,10 +23,9 @@ $action = ($status == "create") ? url("admin/update", true) : url("admin/update/
 	<label for="template">Template</label>
 	<?php echo Template::doList($template); ?>
 
-	<label for="content">Page URL</label>
-	<p><?php echo url($path); ?></p>
-	<input type="hidden" name="path" value="<?php echo $path; ?>" />
-
+	<label for="path">Page URL</label>
+	<input type="text" name="path" value="<?php echo $path; ?>" />
+	<p>Actual URL: <span id="actual_page_path_url"><?php echo url($path); ?></span></p>
 
 	<input type="submit" value="<?php echo $GLOBALS['language'][$status.'_button']; ?>" id="edit-button" class="button" />
 </form>
