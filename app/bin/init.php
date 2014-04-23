@@ -392,6 +392,7 @@ function custom_error($errno, $message, $file, $line) {
 		'file' => $file,
 		'line' => $line
 	);
+	dump_request_to_logfile($vars);
 	die(View::do_fetch(getPath('views/errors/400.php'), $vars));
 
 	/* Don't execute PHP internal error handler */
