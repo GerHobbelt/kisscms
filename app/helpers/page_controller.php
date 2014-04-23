@@ -5,7 +5,6 @@ class Page_Controller extends KISS_Auth {
 
 	//This function maps the controller name and function name to the file location of the .php file to include
 	function index($params) {
-
 		// get the page details stored in the database
 		$is_page = $this->getPage();
 		$is_category = $this->getCategoryPages($is_page);
@@ -24,7 +23,6 @@ class Page_Controller extends KISS_Auth {
 
 	// - Helpers
 	function getPage() {
-
 		$data = array();
 		// if there is no path, load the index
 		if (empty($this->data['path'])) {
@@ -43,7 +41,7 @@ class Page_Controller extends KISS_Auth {
 			$data['tags'] = stripslashes($page->get('tags'));
 			$data['date'] = strtotime(stripslashes($page->get('date')));
 			// check if the page has been classified as a category
-			$this->category = (strpos($data['tags'], "category") > -1) ? true : false;
+			$this->category = (strpos($data['tags'], "category") > -1);
 
 			$data['path'] = $this->data['path'];
 			//$data['view'] = getPath('views/main/body.php');
@@ -55,7 +53,6 @@ class Page_Controller extends KISS_Auth {
 		} else {
 			return false;
 		}
-
 	}
 
 	function getCategoryPages($is_page = false) {
@@ -85,7 +82,6 @@ class Page_Controller extends KISS_Auth {
 		} else {
 			return false;
 		}
-
 	}
 
 
@@ -102,6 +98,5 @@ class Page_Controller extends KISS_Auth {
 			$data['view'] = getPath('views/errors/404.php');
 			$this->data['body'][] = $data;
 		}
-
 	}
 }

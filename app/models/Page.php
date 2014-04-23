@@ -7,20 +7,19 @@ class Page extends Model {
 		$this->tablename = $table;
 		// the model
 		$this->rs['id'] = '';
-			$this->rs['title'] = '';
-			$this->rs['content'] = '';
-			$this->rs['path'] = '';
-			$this->rs['date'] = '';
-			$this->rs['tags'] = '';
-			$this->rs['template'] = '';
+		$this->rs['title'] = '';
+		$this->rs['content'] = '';
+		$this->rs['path'] = '';
+		$this->rs['date'] = '';
+		$this->rs['tags'] = '';
+		$this->rs['template'] = '';
 		// initiate parent constructor
 		parent::__construct(DB_PAGES,  $this->pkname, $this->tablename); //primary key = id; tablename = pages
-			// retrieve the specific page (if available)
-			if ($id) {
-				$this->retrieve($id);
+		// retrieve the specific page (if available)
+		if ($id) {
+			$this->retrieve($id);
 			$this->id = $id;
 		}
-
 	}
 
 	function create() {
@@ -43,13 +42,12 @@ class Page extends Model {
 		if (!$page)
 			return false;
 		foreach ($page as $k => $v)
-			$this->set($k,$v);
+			$this->set($k, $v);
 		return true;
 	}
 
 
 	static function register($id, $key = false, $value = "") {
-
 		// stop if variable already available
 		if (!isset($GLOBALS['db_schema'])) $GLOBALS['db_schema'] = array();
 		if (array_key_exists("pages", $GLOBALS['db_schema']) && in_array($key, $GLOBALS['db_schema']['pages'])) return;
@@ -107,7 +105,6 @@ class Page extends Model {
 				$page->set("$key", "$value");
 			}
 			$newpage->create();
-
 		} else {
 			if ($key) {
 				$mypage = new Page($id);
@@ -119,7 +116,6 @@ class Page extends Model {
 				}
 			}
 		}
-
 	}
 
 }

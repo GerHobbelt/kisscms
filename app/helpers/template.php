@@ -99,7 +99,6 @@ class Template extends KISS_View {
 
 
 	function process($html) {
-
 		// setup
 		$min = new Minify();
 
@@ -124,7 +123,6 @@ class Template extends KISS_View {
 
 		// output the final markup - clear whitespace
 		return  (DEBUG) ? $output : $this->trimWhitespace($output);
-
 	}
 
 
@@ -146,6 +144,7 @@ class Template extends KISS_View {
 		// generate a hash form the string
 		return $prefix . hash("md5", $string);
 	}
+
 	static function getCache($file) {
 		$cache = new Minify_Cache_File();
 		$dir = dirname($file);
@@ -155,8 +154,9 @@ class Template extends KISS_View {
 		if (!is_dir($cache_path)) mkdir($cache_path, 0775, true);
 
 		// check if the file is less than an hour old
-		return ($cache->isValid($file, time("now")-3600)) ? $cache->fetch($file) : false;
+		return ($cache->isValid($file, time("now") - 3600)) ? $cache->fetch($file) : false;
 	}
+	
 	static function setCache($file, $data) {
 		$cache = new Minify_Cache_File();
 		$cache->store($file, $data);
